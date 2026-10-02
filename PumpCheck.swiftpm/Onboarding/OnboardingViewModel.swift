@@ -252,33 +252,38 @@ class OnboardingViewModel {
         }
         
         // Fetch progress entries
-        let progressSnapshot = try? await db.collection("users").document(uid).collection("progress").order(by: "date", descending: false).getDocuments()
-        
         var fetchedEntries: [ProgressEntry] = []
-        if let docs = progressSnapshot?.documents {
-            for pDoc in docs {
-                let pData = pDoc.data()
-                let id = pData["id"] as? String ?? pDoc.documentID
-                let ts = pData["date"] as? Timestamp
-                let date = ts?.dateValue() ?? Date()
-                let photoBase64 = pData["photoBase64"] as? String ?? ""
-                let weight = pData["weight"] as? String ?? ""
-                
-                var entryLifts: [LiftRecord] = []
-                if let liftsDictArray = pData["lifts"] as? [[String: Any]] {
-                    entryLifts = liftsDictArray.compactMap { dict in
-                        guard let n = dict["name"] as? String,
-                              let w = dict["weight"] as? Double,
-                              let r = dict["reps"] as? Int else { return nil }
-                        return LiftRecord(name: n, weight: w, reps: r)
+        do {
+            let progressSnapshot = try await db.collection("users").document(uid).collection("progress").getDocuments()
+            if let docs = progressSnapshot.documents as? [QueryDocumentSnapshot] {
+                for pDoc in docs {
+                    let pData = pDoc.data()
+                    let id = pData["id"] as? String ?? pDoc.documentID
+                    let ts = pData["date"] as? Timestamp
+                    let date = ts?.dateValue() ?? Date()
+                    let photoBase64 = pData["photoBase64"] as? String ?? ""
+                    let weight = pData["weight"] as? String ?? ""
+                    
+                    var entryLifts: [LiftRecord] = []
+                    if let liftsDictArray = pData["lifts"] as? [[String: Any]] {
+                        entryLifts = liftsDictArray.compactMap { dict in
+                            guard let n = dict["name"] as? String,
+                                  let w = dict["weight"] as? Double,
+                                  let r = dict["reps"] as? Int else { return nil }
+                            return LiftRecord(name: n, weight: w, reps: r)
+                        }
                     }
+                    
+                    let entry = ProgressEntry(id: id, date: date, photoBase64: photoBase64, weight: weight, lifts: entryLifts)
+                    fetchedEntries.append(entry)
                 }
-                
-                let entry = ProgressEntry(id: id, date: date, photoBase64: photoBase64, weight: weight, lifts: entryLifts)
-                fetchedEntries.append(entry)
+            }
+        } catch {
+            print("FIREBASE ERROR fetching progress: \(error.localizedDescription)")
+            await MainActor.run {
+                self.errorMessage = "Firebase Rules Error: \(error.localizedDescription). Please update Firestore rules to allow subcollections."
             }
         }
-        
         await MainActor.run {
             self.username = data["username"] as? String ?? self.username
             self.height = data["height"] as? String ?? ""
@@ -304,7 +309,7 @@ class OnboardingViewModel {
                 self.profileImageData = imgData
             }
             
-            self.progressEntries = fetchedEntries
+            self.progressEntries = fetchedEntries.sorted(by: { $0.date < $1.date })
         }
     }
 
