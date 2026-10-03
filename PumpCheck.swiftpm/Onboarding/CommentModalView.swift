@@ -4,7 +4,7 @@ import FirebaseAuth
 struct CommentModalView: View {
     @Bindable var viewModel: OnboardingViewModel
     @Binding var post: FeedPost
-    @Binding var isPresented: Bool
+    var onClose: () -> Void
     var onNavigateToProfile: (String, String) -> Void
     @State private var commentText: String = ""
     
@@ -13,9 +13,7 @@ struct CommentModalView: View {
             // Header
             HStack {
                 Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        isPresented = false
-                    }
+                    onClose()
                 } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 20, weight: .bold))

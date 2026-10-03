@@ -64,10 +64,11 @@ struct FeedView: View {
                     CommentModalView(
                         viewModel: viewModel, 
                         post: $posts[index], 
-                        isPresented: Binding(
-                            get: { selectedPostId != nil },
-                            set: { if !$0 { selectedPostId = nil } }
-                        ),
+                        onClose: {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                selectedPostId = nil
+                            }
+                        },
                         onNavigateToProfile: { uid, uname in
                             selectedPostId = nil
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
