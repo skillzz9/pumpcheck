@@ -1,8 +1,13 @@
 import SwiftUI
 import FirebaseAuth
+import Charts
 
 struct ProfileView: View {
     var viewModel: OnboardingViewModel
+    
+    @State private var showHeightChart = false
+    @State private var showWeightChart = false
+    @State private var selectedLiftChartName: String? = nil
     
     var body: some View {
         ZStack {
@@ -58,32 +63,36 @@ struct ProfileView: View {
                         
                         HStack(spacing: 12) {
                             // Height Pill
-                            HStack(spacing: 6) {
-                                Image(systemName: "ruler.fill")
-                                    .foregroundColor(Theme.accent)
-                                Text("\(viewModel.height.isEmpty ? "--" : viewModel.height) \(viewModel.isHeightCm ? "cm" : "in")")
-                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                    .foregroundColor(Theme.textPrimary)
+                            Button { showHeightChart = true } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "ruler.fill")
+                                        .foregroundColor(Theme.accent)
+                                    Text("\(viewModel.height.isEmpty ? "--" : viewModel.height) \(viewModel.isHeightCm ? "cm" : "in")")
+                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Theme.textPrimary)
+                                }
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Theme.cardBackground)
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
                             }
-                            .padding(.vertical, 8)
-                            .frame(maxWidth: .infinity)
-                            .background(Theme.cardBackground)
-                            .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
                             
                             // Weight Pill
-                            HStack(spacing: 6) {
-                                Image(systemName: "scalemass.fill")
-                                    .foregroundColor(Theme.accent)
-                                Text("\(viewModel.weight.isEmpty ? "--" : viewModel.weight) \(viewModel.isWeightKg ? "kg" : "lbs")")
-                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                    .foregroundColor(Theme.textPrimary)
+                            Button { showWeightChart = true } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "scalemass.fill")
+                                        .foregroundColor(Theme.accent)
+                                    Text("\(viewModel.weight.isEmpty ? "--" : viewModel.weight) \(viewModel.isWeightKg ? "kg" : "lbs")")
+                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Theme.textPrimary)
+                                }
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity)
+                                .background(Theme.cardBackground)
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
                             }
-                            .padding(.vertical, 8)
-                            .frame(maxWidth: .infinity)
-                            .background(Theme.cardBackground)
-                            .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
                             
                             // Kudos Pill
                             HStack(spacing: 6) {
