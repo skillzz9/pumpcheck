@@ -12,26 +12,27 @@ struct PostComment: Identifiable {
     var likesCount: Int
 }
 
+import FirebaseFirestore
+import FirebaseAuth
+
 struct FeedPost: Identifiable {
     let id: String
+    let userId: String
     let username: String
-    let imageName: String // Mock for now
+    var photoBase64: String
     var kudos: Int
     var isKudoed: Bool
     var caption: String
+    var date: Date
     var comments: [PostComment] = []
 }
 
 struct FeedView: View {
     @Bindable var viewModel: OnboardingViewModel
     
-    @State private var posts: [FeedPost] = [
-        FeedPost(id: "1", username: "alex_fitness", imageName: "dummy1", kudos: 12, isKudoed: false, caption: "Crushed the morning workout! 💪", comments: [
-            PostComment(id: "c1", username: "gym_bro", photoBase64: "", text: "Looking huge man!", isLiked: false, likesCount: 2)
-        ]),
-        FeedPost(id: "2", username: "sarah_lifts", imageName: "dummy2", kudos: 45, isKudoed: true, caption: "Leg day is the best day. 🦵", comments: []),
-        FeedPost(id: "3", username: "mike_pump", imageName: "dummy3", kudos: 0, isKudoed: false, caption: "Rest day vibes.", comments: [])
-    ]
+    @State private var posts: [FeedPost] = []
+    @State private var isLoading = true
+    @State private var showCreatePost = false
     
     @State private var selectedPostId: String? = nil
     
@@ -63,6 +64,62 @@ struct FeedView: View {
             .toolbarBackground(Theme.pitchBlack, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { showCreatePost = true }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(Theme.accent)
+                            .padding(8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                    }
+                }
+            }
+        }
+        .task {
+            await fetchPosts()
+        }
+        .sheet(isPresented: $showCreatePost) {
+            CreatePostModalView(isPresented: $showCreatePost, viewModel: viewModel, onPostCreated: {
+                Task {
+                    await fetchPosts()
+                }
+            })
+        }
+    }
+    
+    private func fetchPosts() async {
+        isLoading = true
+        let db = Firestore.firestore()
+        do {
+            let snapshot = try await db.collection("posts").order(by: "date", descending: true).getDocuments()
+            var fetchedPosts: [FeedPost] = []
+            
+            for doc in snapshot.documents {
+                let data = doc.data()
+                let id = data["id"] as? String ?? doc.documentID
+                let userId = data["userId"] as? String ?? ""
+                let username = data["username"] as? String ?? "Unknown"
+                let photoBase64 = data["photoBase64"] as? String ?? ""
+                let caption = data["caption"] as? String ?? ""
+                let kudos = data["kudos"] as? Int ?? 0
+                let ts = data["date"] as? Timestamp
+                let date = ts?.dateValue() ?? Date()
+                
+                let post = FeedPost(id: id, userId: userId, username: username, photoBase64: photoBase64, kudos: kudos, isKudoed: false, caption: caption, date: date)
+                fetchedPosts.append(post)
+            }
+            
+            await MainActor.run {
+                self.posts = fetchedPosts
+                self.isLoading = false
+            }
+        } catch {
+            print("Error fetching posts: \(error.localizedDescription)")
+            await MainActor.run {
+                self.isLoading = false
+            }
         }
     }
 }
@@ -73,15 +130,37 @@ struct FeedPostView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Image area (Mocked as a rectangle with a photo icon)
-            Rectangle()
-                .fill(Theme.cardBackground)
-                .aspectRatio(1.0, contentMode: .fit)
-                .overlay {
-                    Image(systemName: "photo")
-                        .font(.system(size: 50))
-                        .foregroundColor(Theme.taupeGrey.opacity(0.5))
-                }
+            
+            // Header
+            HStack {
+                Text(post.username)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(Theme.textPrimary)
+                Spacer()
+                Text(post.date, style: .time)
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundColor(Theme.textSecondary)
+            }
+            .padding(.horizontal, 16)
+            
+            // Image area
+            if let data = Data(base64Encoded: post.photoBase64), let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(1.0, contentMode: .fit)
+                    .clipped()
+            } else {
+                Rectangle()
+                    .fill(Theme.cardBackground)
+                    .aspectRatio(1.0, contentMode: .fit)
+                    .overlay {
+                        Image(systemName: "photo")
+                            .font(.system(size: 50))
+                            .foregroundColor(Theme.taupeGrey.opacity(0.5))
+                    }
+            }
             
             // Action Buttons
             HStack(spacing: 16) {
@@ -116,6 +195,16 @@ struct FeedPostView: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(Theme.textPrimary)
                     .padding(.horizontal, 12)
+            }
+            
+            // Caption
+            if !post.caption.isEmpty {
+                HStack(alignment: .top) {
+                    Text(post.username).bold() + Text(" ") + Text(post.caption)
+                }
+                .font(.system(size: 14, design: .rounded))
+                .foregroundColor(Theme.textPrimary)
+                .padding(.horizontal, 12)
             }
         }
     }
