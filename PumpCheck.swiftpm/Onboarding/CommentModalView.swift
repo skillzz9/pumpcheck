@@ -20,7 +20,10 @@ struct CommentModalView: View {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(Theme.textPrimary)
+                        .padding(16)
+                        .contentShape(Rectangle())
                 }
+                .padding(.leading, -16)
                 
                 Spacer()
                 
