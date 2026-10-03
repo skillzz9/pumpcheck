@@ -287,23 +287,31 @@ class OnboardingViewModel {
         await MainActor.run {
             self.username = data["username"] as? String ?? self.username
             
-            // Force cleanup bad retroactive entry for hugoesgym
-            if self.progressEntries.count == 1, 
-               let first = self.progressEntries.first, 
-               Date().timeIntervalSince(first.date) < 3600 {
-                
-                let originalTs = data["createdAt"] as? Timestamp
-                if let oDate = originalTs?.dateValue(), abs(oDate.timeIntervalSince(first.date)) > 86400 {
-                    // It was created today, but account was created >1 day ago. This is the bad retro entry!
-                    Task {
-                        try? await db.collection("users").document(uid).collection("progress").document(first.id).delete()
-                    }
-                    self.progressEntries.removeAll()
+            var currentEntries = fetchedEntries
+            
+            // Clean up duplicate entries caused by the previous initialization bug.
+            var uniqueDates = Set<Date>()
+            var duplicatesToDelete: [ProgressEntry] = []
+            var cleanEntries: [ProgressEntry] = []
+            
+            for entry in currentEntries {
+                if uniqueDates.contains(entry.date) {
+                    duplicatesToDelete.append(entry)
+                } else {
+                    uniqueDates.insert(entry.date)
+                    cleanEntries.append(entry)
                 }
             }
             
+            for dup in duplicatesToDelete {
+                Task {
+                    try? await db.collection("users").document(uid).collection("progress").document(dup.id).delete()
+                }
+            }
+            currentEntries = cleanEntries
+            
             // Retroactive fix for empty calendar
-            if self.progressEntries.isEmpty {
+            if currentEntries.isEmpty {
                 let initialEntryId = UUID().uuidString
                 let originalDate = data["createdAt"] ?? FieldValue.serverTimestamp()
                 
@@ -338,8 +346,10 @@ class OnboardingViewModel {
                     weight: data["weight"] as? String ?? "",
                     lifts: retroLifts
                 )
-                self.progressEntries = [retroEntry]
+                currentEntries = [retroEntry]
             }
+            
+            self.progressEntries = currentEntries
             self.height = data["height"] as? String ?? ""
             self.isHeightCm = data["isHeightCm"] as? Bool ?? true
             self.weight = data["weight"] as? String ?? ""
