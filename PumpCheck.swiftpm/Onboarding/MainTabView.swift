@@ -6,16 +6,11 @@ struct MainTabView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            ZStack {
-                Theme.bgGradient.ignoresSafeArea()
-                Text("Feed Coming Soon")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
-            }
-            .tabItem {
-                Label("Feed", systemImage: "list.bullet")
-            }
-            .tag(0)
+            FeedView()
+                .tabItem {
+                    Label("Feed", systemImage: "list.bullet")
+                }
+                .tag(0)
             
             ProgramView(viewModel: viewModel)
                 .tabItem {

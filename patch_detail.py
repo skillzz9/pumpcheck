@@ -1,4 +1,7 @@
-import SwiftUI
+with open("PumpCheck.swiftpm/Onboarding/ProgressDetailView.swift", "r") as f:
+    content = f.read()
+
+replacement = """import SwiftUI
 
 struct ProgressDetailView: View {
     @State private var currentEntry: ProgressEntry
@@ -67,7 +70,7 @@ struct ProgressDetailView: View {
                             HStack {
                                 Image(systemName: "scalemass.fill")
                                     .foregroundColor(Theme.accent)
-                                Text("\(currentEntry.weight) \(isWeightKg ? "kg" : "lbs")")
+                                Text("\\(currentEntry.weight) \\(isWeightKg ? "kg" : "lbs")")
                                     .font(.system(size: 24, weight: .bold, design: .rounded))
                                     .foregroundColor(Theme.textPrimary)
                             }
@@ -93,7 +96,7 @@ struct ProgressDetailView: View {
                                                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                                                 .foregroundColor(Theme.textPrimary)
                                             Spacer()
-                                            Text("\(lift.weight, specifier: "%.1f") × \(lift.reps)")
+                                            Text("\\(lift.weight, specifier: "%.1f") × \\(lift.reps)")
                                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                                 .foregroundColor(Theme.accent)
                                         }
@@ -125,3 +128,9 @@ struct ProgressDetailView: View {
         }
     }
 }
+"""
+
+with open("PumpCheck.swiftpm/Onboarding/ProgressDetailView.swift", "w") as f:
+    f.write(replacement)
+
+print("Patched ProgressDetailView successfully!")

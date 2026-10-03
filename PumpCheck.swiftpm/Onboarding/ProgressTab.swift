@@ -125,7 +125,7 @@ struct ProgressTab: View {
             }
         }
         .sheet(item: $selectedEntry) { entry in
-            ProgressDetailView(entry: entry, isWeightKg: viewModel.isWeightKg) { selectedEntry = nil }
+            ProgressDetailView(initialEntry: entry, allEntries: viewModel.progressEntries, isWeightKg: viewModel.isWeightKg) { selectedEntry = nil }
         }
         .sheet(isPresented: $showLogModal) {
             if let data = selectedImageData, let uiImage = UIImage(data: data) {
