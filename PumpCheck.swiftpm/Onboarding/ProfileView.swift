@@ -106,9 +106,9 @@ struct ProfileView: View {
                     .padding(.horizontal, 24)
                     .background(
                         IrregularGradient(
-                            colors: [Color.white, Theme.accent.opacity(0.15), Color.blue.opacity(0.1), Color.white, Color.purple.opacity(0.1)],
-                            background: Color.white,
-                            speed: 4
+                            colors: [Theme.accent, Color.purple, Color.indigo, Color.blue, Color.cyan],
+                            background: Theme.pitchBlack,
+                            speed: 0.5
                         )
                         .padding(.top, -1000)
                         .padding(.horizontal, -24)

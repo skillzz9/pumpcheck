@@ -1,0 +1,407 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme PumpCheck -destination "platform=iOS Simulator,id=E8522386-D9C4-49CE-A6D1-BD717AD8A14E" -derivedDataPath ../build
+
+Resolve Package Graph
+2026-10-03 16:33:52.260 xcodebuild[99384:13376063] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  nanopb: https://github.com/firebase/nanopb.git @ 2.30910.1
+  GoogleAppMeasurement: https://github.com/google/GoogleAppMeasurement.git @ 10.28.0
+  IrregularGradient: https://github.com/joogps/IrregularGradient.git @ 2.1.0
+  leveldb: https://github.com/firebase/leveldb.git @ 1.22.5
+  Pow: https://github.com/EmergeTools/Pow @ 1.0.6
+  GoogleUtilities: https://github.com/google/GoogleUtilities.git @ 7.13.3
+  GTMSessionFetcher: https://github.com/google/gtm-session-fetcher.git @ 3.5.0
+  Firebase: https://github.com/firebase/firebase-ios-sdk.git @ 10.29.0
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  GoogleDataTransport: https://github.com/google/GoogleDataTransport.git @ 9.4.0
+  InteropForGoogle: https://github.com/google/interop-ios-for-google-sdks.git @ 100.0.0
+  PumpCheck: /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
+  gRPC: https://github.com/google/grpc-binary.git @ 1.62.2
+  Promises: https://github.com/google/promises.git @ 2.4.1
+  AppCheck: https://github.com/google/app-check.git @ 10.19.2
+  abseil: https://github.com/google/abseil-cpp-binary.git @ 1.2024011602.0
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (67 targets)
+    Target 'PumpCheck' in project 'PumpCheck'
+        ➜ Explicit dependency on target 'Pow' in project 'Pow'
+        ➜ Explicit dependency on target 'FirebaseAuth' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseStorage' in project 'Firebase'
+        ➜ Explicit dependency on target 'IrregularGradient' in project 'IrregularGradient'
+    Target 'IrregularGradient' in project 'IrregularGradient'
+        ➜ Explicit dependency on target 'IrregularGradient' in project 'IrregularGradient'
+    Target 'IrregularGradient' in project 'IrregularGradient' (no dependencies)
+    Target 'FirebaseStorage' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseStorage' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAuthInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreExtension' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+    Target 'FirebaseStorage' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAuthInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreExtension' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+    Target 'FirebaseAuthInterop' in project 'Firebase' (no dependencies)
+    Target 'FirebaseFirestore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestoreTarget' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestoreInternalWrapper' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreExtension' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseSharedSwift' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestore' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'abseil' in project 'abseil'
+        ➜ Explicit dependency on target 'gRPC-C++' in project 'gRPC'
+        ➜ Explicit dependency on target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'leveldb' in project 'leveldb'
+    Target 'FirebaseFirestoreTarget' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestoreInternalWrapper' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreExtension' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseSharedSwift' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestore' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'abseil' in project 'abseil'
+        ➜ Explicit dependency on target 'gRPC-C++' in project 'gRPC'
+        ➜ Explicit dependency on target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'leveldb' in project 'leveldb'
+    Target 'FirebaseFirestore' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseFirestore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseFirestoreInternalWrapper' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreExtension' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseSharedSwift' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'abseil' in project 'abseil'
+        ➜ Explicit dependency on target 'gRPC-C++' in project 'gRPC'
+        ➜ Explicit dependency on target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'leveldb' in project 'leveldb'
+    Target 'leveldb' in project 'leveldb'
+        ➜ Explicit dependency on target 'leveldb' in project 'leveldb'
+        ➜ Explicit dependency on target 'leveldb_leveldb' in project 'leveldb'
+    Target 'leveldb' in project 'leveldb'
+        ➜ Explicit dependency on target 'leveldb_leveldb' in project 'leveldb'
+    Target 'leveldb_leveldb' in project 'leveldb' (no dependencies)
+    Target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'nanopb_nanopb' in project 'nanopb'
+    Target 'nanopb' in project 'nanopb'
+        ➜ Explicit dependency on target 'nanopb_nanopb' in project 'nanopb'
+    Target 'nanopb_nanopb' in project 'nanopb' (no dependencies)
+    Target 'gRPC-C++' in project 'gRPC'
+        ➜ Explicit dependency on target 'grpcppWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'gRPC_grpcppWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'grpcWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'opensslWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'abseil' in project 'abseil'
+    Target 'grpcppWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'gRPC_grpcppWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'grpcWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'opensslWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'abseil' in project 'abseil'
+    Target 'opensslWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'gRPC_opensslWrapper' in project 'gRPC'
+    Target 'gRPC_opensslWrapper' in project 'gRPC' (no dependencies)
+    Target 'grpcWrapper' in project 'gRPC'
+        ➜ Explicit dependency on target 'gRPC_grpcWrapper' in project 'gRPC'
+    Target 'gRPC_grpcWrapper' in project 'gRPC' (no dependencies)
+    Target 'gRPC_grpcppWrapper' in project 'gRPC' (no dependencies)
+    Target 'abseil' in project 'abseil'
+        ➜ Explicit dependency on target 'abslWrapper' in project 'abseil'
+        ➜ Explicit dependency on target 'abseil_abslWrapper' in project 'abseil'
+    Target 'abslWrapper' in project 'abseil'
+        ➜ Explicit dependency on target 'abseil_abslWrapper' in project 'abseil'
+    Target 'abseil_abslWrapper' in project 'abseil' (no dependencies)
+    Target 'Firebase_FirebaseFirestore' in project 'Firebase' (no dependencies)
+    Target 'FirebaseSharedSwift' in project 'Firebase' (no dependencies)
+    Target 'FirebaseCoreExtension' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseCoreExtension' in project 'Firebase'
+    Target 'Firebase_FirebaseCoreExtension' in project 'Firebase' (no dependencies)
+    Target 'FirebaseFirestoreInternalWrapper' in project 'Firebase' (no dependencies)
+    Target 'FirebaseAuth' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAuth' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseAuth' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULAppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'RecaptchaInterop' in project 'InteropForGoogle'
+    Target 'FirebaseAuth' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseAuth' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseAppCheckInterop' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULAppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'RecaptchaInterop' in project 'InteropForGoogle'
+    Target 'RecaptchaInterop' in project 'InteropForGoogle'
+        ➜ Explicit dependency on target 'RecaptchaInterop' in project 'InteropForGoogle'
+    Target 'RecaptchaInterop' in project 'InteropForGoogle' (no dependencies)
+    Target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'GTMSessionFetcher_GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+    Target 'GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+        ➜ Explicit dependency on target 'GTMSessionFetcher_GTMSessionFetcherCore' in project 'GTMSessionFetcher'
+    Target 'GTMSessionFetcher_GTMSessionFetcherCore' in project 'GTMSessionFetcher' (no dependencies)
+    Target 'GULAppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Network' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Network' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities-Network' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Network' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities_GoogleUtilities-Network' in project 'GoogleUtilities' (no dependencies)
+    Target 'GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Reachability' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities_GoogleUtilities-Reachability' in project 'GoogleUtilities' (no dependencies)
+    Target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' in project 'GoogleUtilities' (no dependencies)
+    Target 'FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseCore' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase' in project 'Firebase'
+        ➜ Explicit dependency on target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GULLogger' in project 'GoogleUtilities'
+    Target 'GULLogger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Logger' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities_GoogleUtilities-Logger' in project 'GoogleUtilities' (no dependencies)
+    Target 'GULEnvironment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-Environment' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'third-party-IsAppEncrypted' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+    Target 'FBLPromises' in project 'Promises'
+        ➜ Explicit dependency on target 'FBLPromises' in project 'Promises'
+        ➜ Explicit dependency on target 'Promises_FBLPromises' in project 'Promises'
+    Target 'FBLPromises' in project 'Promises'
+        ➜ Explicit dependency on target 'Promises_FBLPromises' in project 'Promises'
+    Target 'Promises_FBLPromises' in project 'Promises' (no dependencies)
+    Target 'third-party-IsAppEncrypted' in project 'GoogleUtilities' (no dependencies)
+    Target 'GoogleUtilities_GoogleUtilities-Environment' in project 'GoogleUtilities' (no dependencies)
+    Target 'Firebase_FirebaseCore' in project 'Firebase' (no dependencies)
+    Target 'FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'Firebase_FirebaseCoreInternal' in project 'Firebase'
+        ➜ Explicit dependency on target 'GULNSData' in project 'GoogleUtilities'
+    Target 'GULNSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-NSData' in project 'GoogleUtilities'
+    Target 'GoogleUtilities-NSData' in project 'GoogleUtilities'
+        ➜ Explicit dependency on target 'GoogleUtilities_GoogleUtilities-NSData' in project 'GoogleUtilities'
+    Target 'GoogleUtilities_GoogleUtilities-NSData' in project 'GoogleUtilities' (no dependencies)
+    Target 'Firebase_FirebaseCoreInternal' in project 'Firebase' (no dependencies)
+    Target 'Firebase' in project 'Firebase' (no dependencies)
+    Target 'FirebaseAppCheckInterop' in project 'Firebase' (no dependencies)
+    Target 'Firebase_FirebaseAuth' in project 'Firebase' (no dependencies)
+    Target 'Pow' in project 'Pow'
+        ➜ Explicit dependency on target 'Pow' in project 'Pow'
+        ➜ Explicit dependency on target 'Pow_Pow' in project 'Pow'
+    Target 'Pow' in project 'Pow'
+        ➜ Explicit dependency on target 'Pow_Pow' in project 'Pow'
+    Target 'Pow_Pow' in project 'Pow' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c++ -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/DerivedSources/AppPlaygroundDefaultAssetCatalog.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 5f7d8c09c4420b3a66ef4d82766d0a83
+Build description path: /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/XCBuildData/5f7d8c09c4420b3a66ef4d82766d0a83.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk /Users/hugoposthuma/Downloads/PumpCheck/build/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448f6cfe768891a92b912361537c460fe42b.sdkstatcache
+    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -o /Users/hugoposthuma/Downloads/PumpCheck/build/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448f6cfe768891a92b912361537c460fe42b.sdkstatcache
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/nanopb_nanopb.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/nanopb.build/Debug-iphonesimulator/nanopb_nanopb.build/empty-nanopb_nanopb.plist (in target 'nanopb_nanopb' from project 'nanopb')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/nanopb
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/nanopb.build/Debug-iphonesimulator/nanopb_nanopb.build/empty-nanopb_nanopb.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/nanopb_nanopb.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/leveldb_leveldb.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/leveldb.build/Debug-iphonesimulator/leveldb_leveldb.build/empty-leveldb_leveldb.plist (in target 'leveldb_leveldb' from project 'leveldb')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/leveldb
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/leveldb.build/Debug-iphonesimulator/leveldb_leveldb.build/empty-leveldb_leveldb.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/leveldb_leveldb.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/abseil_abslWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/abseil.build/Debug-iphonesimulator/abseil_abslWrapper.build/empty-abseil_abslWrapper.plist (in target 'abseil_abslWrapper' from project 'abseil')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/abseil-cpp-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/abseil.build/Debug-iphonesimulator/abseil_abslWrapper.build/empty-abseil_abslWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/abseil_abslWrapper.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-NSData.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-NSData.build/empty-GoogleUtilities_GoogleUtilities-NSData.plist (in target 'GoogleUtilities_GoogleUtilities-NSData' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-NSData.build/empty-GoogleUtilities_GoogleUtilities-NSData.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-NSData.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.build/empty-GoogleUtilities_GoogleUtilities-Network.plist (in target 'GoogleUtilities_GoogleUtilities-Network' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.build/empty-GoogleUtilities_GoogleUtilities-Network.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcWrapper.build/empty-gRPC_grpcWrapper.plist (in target 'gRPC_grpcWrapper' from project 'gRPC')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcWrapper.build/empty-gRPC_grpcWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcWrapper.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_opensslWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_opensslWrapper.build/empty-gRPC_opensslWrapper.plist (in target 'gRPC_opensslWrapper' from project 'gRPC')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_opensslWrapper.build/empty-gRPC_opensslWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_opensslWrapper.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.build/empty-GoogleUtilities_GoogleUtilities-Reachability.plist (in target 'GoogleUtilities_GoogleUtilities-Reachability' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.build/empty-GoogleUtilities_GoogleUtilities-Reachability.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.build/empty-GoogleUtilities_GoogleUtilities-Logger.plist (in target 'GoogleUtilities_GoogleUtilities-Logger' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.build/empty-GoogleUtilities_GoogleUtilities-Logger.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Promises_FBLPromises.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Promises.build/Debug-iphonesimulator/Promises_FBLPromises.build/empty-Promises_FBLPromises.plist (in target 'Promises_FBLPromises' from project 'Promises')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/promises
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Promises.build/Debug-iphonesimulator/Promises_FBLPromises.build/empty-Promises_FBLPromises.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Promises_FBLPromises.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.build/empty-GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.plist (in target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.build/empty-GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.build/empty-GoogleUtilities_GoogleUtilities-Environment.plist (in target 'GoogleUtilities_GoogleUtilities-Environment' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.build/empty-GoogleUtilities_GoogleUtilities-Environment.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GTMSessionFetcher_GTMSessionFetcherCore.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GTMSessionFetcher.build/Debug-iphonesimulator/GTMSessionFetcher_GTMSessionFetcherCore.build/empty-GTMSessionFetcher_GTMSessionFetcherCore.plist (in target 'GTMSessionFetcher_GTMSessionFetcherCore' from project 'GTMSessionFetcher')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/gtm-session-fetcher
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GTMSessionFetcher.build/Debug-iphonesimulator/GTMSessionFetcher_GTMSessionFetcherCore.build/empty-GTMSessionFetcher_GTMSessionFetcherCore.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GTMSessionFetcher_GTMSessionFetcherCore.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseCoreInternal.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseCoreInternal.build/empty-Firebase_FirebaseCoreInternal.plist (in target 'Firebase_FirebaseCoreInternal' from project 'Firebase')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/firebase-ios-sdk
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseCoreInternal.build/empty-Firebase_FirebaseCoreInternal.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseCoreInternal.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseCoreExtension.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseCoreExtension.build/empty-Firebase_FirebaseCoreExtension.plist (in target 'Firebase_FirebaseCoreExtension' from project 'Firebase')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/firebase-ios-sdk
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseCoreExtension.build/empty-Firebase_FirebaseCoreExtension.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseCoreExtension.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseAuth.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseAuth.build/empty-Firebase_FirebaseAuth.plist (in target 'Firebase_FirebaseAuth' from project 'Firebase')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/firebase-ios-sdk
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseAuth.build/empty-Firebase_FirebaseAuth.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseAuth.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcppWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcppWrapper.build/empty-gRPC_grpcppWrapper.plist (in target 'gRPC_grpcppWrapper' from project 'gRPC')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcppWrapper.build/empty-gRPC_grpcppWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcppWrapper.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseCore.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseCore.build/empty-Firebase_FirebaseCore.plist (in target 'Firebase_FirebaseCore' from project 'Firebase')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/firebase-ios-sdk
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseCore.build/empty-Firebase_FirebaseCore.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseCore.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseFirestore.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseFirestore.build/empty-Firebase_FirebaseFirestore.plist (in target 'Firebase_FirebaseFirestore' from project 'Firebase')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/firebase-ios-sdk
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/Firebase_FirebaseFirestore.build/empty-Firebase_FirebaseFirestore.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Firebase_FirebaseFirestore.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Pow_Pow.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Pow.build/Debug-iphonesimulator/Pow_Pow.build/empty-Pow_Pow.plist (in target 'Pow_Pow' from project 'Pow')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/Pow
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Pow.build/Debug-iphonesimulator/Pow_Pow.build/empty-Pow_Pow.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Pow.build/Debug-iphonesimulator/Pow_Pow.build/assetcatalog_generated_info.plist -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Pow_Pow.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/empty-PumpCheck.plist (in target 'PumpCheck' from project 'PumpCheck')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/empty-PumpCheck.plist -producttype com.apple.product-type.application -genpkginfo /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/assetcatalog_generated_info.plist -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseAuth.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseCore.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseCoreExtension.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseCoreInternal.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseFirestore.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/FirebaseFirestoreInternal.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/absl.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/grpc.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/grpcpp.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/openssl_grpc.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GTMSessionFetcher_GTMSessionFetcherCore.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Environment.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Logger.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-NSData.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Network.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Reachability.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Pow_Pow.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Promises_FBLPromises.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/abseil_abslWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/gRPC_grpcWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/gRPC_grpcppWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/gRPC_opensslWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/leveldb_leveldb.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/nanopb_nanopb.bundle -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Info.plist
+
+CopySwiftLibs /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app (in target 'PumpCheck' from project 'PumpCheck')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck.debug.dylib --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PlugIns --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/SystemExtensions --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Extensions --platform iphonesimulator --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.HqwKN7/Metal.xctoolchain --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+** BUILD SUCCEEDED **
+
