@@ -9,7 +9,8 @@ struct ProfileView: View {
     @State private var initialStatSelection: StatSelection = .height
     
     var body: some View {
-        ZStack {
+        NavigationStack {
+            ZStack {
             Theme.bgGradient.ignoresSafeArea()
             
             ScrollView {
@@ -213,4 +214,5 @@ struct ProfileView: View {
     .navigationDestination(isPresented: $navToStats) {
         StatsView(username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
     }
+        }
 }
