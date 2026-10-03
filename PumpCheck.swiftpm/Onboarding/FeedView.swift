@@ -5,6 +5,7 @@ import UIKit
 
 struct PostComment: Identifiable {
     let id: String
+    let userId: String
     let username: String
     let photoBase64: String
     let text: String
@@ -133,9 +134,11 @@ struct FeedPostView: View {
             
             // Header
             HStack {
-                Text(post.username)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                NavigationLink(destination: PublicProfileView(userId: post.userId, username: post.username)) {
+                    Text(post.username)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundColor(Theme.textPrimary)
+                }
                 Spacer()
                 Text(post.date, style: .time)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
@@ -199,8 +202,13 @@ struct FeedPostView: View {
             
             // Caption
             if !post.caption.isEmpty {
-                HStack(alignment: .top) {
-                    Text(post.username).bold() + Text(" ") + Text(post.caption)
+                HStack(alignment: .top, spacing: 4) {
+                    NavigationLink(destination: PublicProfileView(userId: post.userId, username: post.username)) {
+                        Text(post.username).bold()
+                            .foregroundColor(Theme.textPrimary)
+                    }
+                    Text(post.caption)
+                        .foregroundColor(Theme.textPrimary)
                 }
                 .font(.system(size: 14, design: .rounded))
                 .foregroundColor(Theme.textPrimary)

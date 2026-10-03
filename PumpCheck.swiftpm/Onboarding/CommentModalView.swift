@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct CommentModalView: View {
     @Bindable var viewModel: OnboardingViewModel
@@ -89,13 +90,16 @@ struct CommentModalView: View {
                                 
                                 // Username and comment text
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(comment.username)
-                                        .font(.system(size: 14, weight: .bold))
-                                        .foregroundColor(Theme.textPrimary)
-                                    + Text(" ")
-                                    + Text(comment.text)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(Theme.textPrimary)
+                                    HStack(alignment: .top, spacing: 4) {
+                                        NavigationLink(destination: PublicProfileView(userId: comment.userId, username: comment.username)) {
+                                            Text(comment.username)
+                                                .font(.system(size: 14, weight: .bold))
+                                                .foregroundColor(Theme.textPrimary)
+                                        }
+                                        Text(comment.text)
+                                            .font(.system(size: 14))
+                                            .foregroundColor(Theme.textPrimary)
+                                    }
                                     
                                     // Reply / likes count (optional instagram style)
                                     if comment.likesCount > 0 {
@@ -138,8 +142,10 @@ struct CommentModalView: View {
                 
                 Button {
                     let base64 = viewModel.profileImageData?.base64EncodedString() ?? ""
+                    let uid = Auth.auth().currentUser?.uid ?? ""
                     let newComment = PostComment(
                         id: UUID().uuidString,
+                        userId: uid,
                         username: viewModel.username,
                         photoBase64: base64,
                         text: commentText,
