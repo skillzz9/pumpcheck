@@ -5,6 +5,7 @@ struct CommentModalView: View {
     @Bindable var viewModel: OnboardingViewModel
     @Binding var post: FeedPost
     @Binding var isPresented: Bool
+    var onNavigateToProfile: (String, String) -> Void
     @State private var commentText: String = ""
     
     var body: some View {
@@ -91,7 +92,7 @@ struct CommentModalView: View {
                                 // Username and comment text
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack(alignment: .top, spacing: 4) {
-                                        NavigationLink(destination: PublicProfileView(userId: comment.userId, username: comment.username)) {
+                                        Button { onNavigateToProfile(comment.userId, comment.username) } label: {
                                             Text(comment.username)
                                                 .font(.system(size: 14, weight: .bold))
                                                 .foregroundColor(Theme.textPrimary)

@@ -36,6 +36,8 @@ struct FeedView: View {
     @State private var showCreatePost = false
     
     @State private var selectedPostId: String? = nil
+    @State private var navToProfileId: String? = nil
+    @State private var navToProfileName: String? = nil
     
     var body: some View {
         NavigationStack {
@@ -45,17 +47,35 @@ struct FeedView: View {
                 ScrollView {
                     LazyVStack(spacing: 24) {
                         ForEach($posts) { $post in
-                            FeedPostView(post: $post, selectedPostId: $selectedPostId)
+                            FeedPostView(
+                                post: $post, 
+                                selectedPostId: $selectedPostId,
+                                onNavigateToProfile: { uid, uname in
+                                    navToProfileId = uid
+                                    navToProfileName = uname
+                                }
+                            )
                         }
                     }
                     .padding(.vertical)
                 }
                 
                 if let selectedId = selectedPostId, let index = posts.firstIndex(where: { $0.id == selectedId }) {
-                    CommentModalView(viewModel: viewModel, post: $posts[index], isPresented: Binding(
-                        get: { selectedPostId != nil },
-                        set: { if !$0 { selectedPostId = nil } }
-                    ))
+                    CommentModalView(
+                        viewModel: viewModel, 
+                        post: $posts[index], 
+                        isPresented: Binding(
+                            get: { selectedPostId != nil },
+                            set: { if !$0 { selectedPostId = nil } }
+                        ),
+                        onNavigateToProfile: { uid, uname in
+                            selectedPostId = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                navToProfileId = uid
+                                navToProfileName = uname
+                            }
+                        }
+                    )
                     .transition(.move(edge: .trailing))
                     .zIndex(1)
                 }
@@ -65,6 +85,14 @@ struct FeedView: View {
             .toolbarBackground(Theme.pitchBlack, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationDestination(isPresented: Binding(
+                get: { navToProfileId != nil },
+                set: { if !$0 { navToProfileId = nil; navToProfileName = nil } }
+            )) {
+                if let uid = navToProfileId, let uname = navToProfileName {
+                    PublicProfileView(userId: uid, username: uname)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showCreatePost = true }) {
@@ -128,16 +156,19 @@ struct FeedView: View {
 struct FeedPostView: View {
     @Binding var post: FeedPost
     @Binding var selectedPostId: String?
+    var onNavigateToProfile: (String, String) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             
             // Header
             HStack {
-                NavigationLink(destination: PublicProfileView(userId: post.userId, username: post.username)) {
+                Button { onNavigateToProfile(post.userId, post.username) } label: {
                     Text(post.username)
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(Theme.textPrimary)
+                .padding(.vertical, 8)
+                .padding(.trailing, 16)
                 }
                 Spacer()
                 Text(post.date, style: .time)
@@ -203,7 +234,7 @@ struct FeedPostView: View {
             // Caption
             if !post.caption.isEmpty {
                 HStack(alignment: .top, spacing: 4) {
-                    NavigationLink(destination: PublicProfileView(userId: post.userId, username: post.username)) {
+                    Button { onNavigateToProfile(post.userId, post.username) } label: {
                         Text(post.username).bold()
                             .foregroundColor(Theme.textPrimary)
                     }

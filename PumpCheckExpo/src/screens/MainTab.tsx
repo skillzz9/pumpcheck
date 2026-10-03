@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FeedView } from './FeedView';
+import { ProfileView } from './ProfileView';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../theme/Theme';
@@ -43,7 +44,7 @@ export function MainTab() {
       <Tab.Screen name="Feed" component={FeedView} />
       <Tab.Screen name="Program" children={() => <PlaceholderScreen title="Program feature coming soon" />} />
       <Tab.Screen name="Progress" children={() => <PlaceholderScreen title="Progress" />} />
-      <Tab.Screen name="Profile" children={() => <PlaceholderScreen title="Profile" />} />
+      <Tab.Screen name="Profile" component={ProfileView} />
     </Tab.Navigator>
   );
 }
