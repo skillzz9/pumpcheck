@@ -6,7 +6,7 @@ struct MainTabView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            FeedView()
+            FeedView(viewModel: viewModel)
                 .tabItem {
                     Label("Feed", systemImage: "list.bullet")
                 }

@@ -289,16 +289,17 @@ class OnboardingViewModel {
             
             var currentEntries = fetchedEntries
             
-            // Clean up duplicate entries caused by the previous initialization bug.
-            var uniqueDates = Set<Date>()
+            // Clean up duplicate entries (comparing strictly by day, ignoring exact time)
+            var uniqueDays = Set<Date>()
             var duplicatesToDelete: [ProgressEntry] = []
             var cleanEntries: [ProgressEntry] = []
             
             for entry in currentEntries {
-                if uniqueDates.contains(entry.date) {
+                let startOfDay = Calendar.current.startOfDay(for: entry.date)
+                if uniqueDays.contains(startOfDay) {
                     duplicatesToDelete.append(entry)
                 } else {
-                    uniqueDates.insert(entry.date)
+                    uniqueDays.insert(startOfDay)
                     cleanEntries.append(entry)
                 }
             }
@@ -310,46 +311,10 @@ class OnboardingViewModel {
             }
             currentEntries = cleanEntries
             
-            // Retroactive fix for empty calendar
-            if currentEntries.isEmpty {
-                let initialEntryId = UUID().uuidString
-                let originalDate = data["createdAt"] ?? FieldValue.serverTimestamp()
-                
-                let progressData: [String: Any] = [
-                    "id": initialEntryId,
-                    "date": originalDate,
-                    "photoBase64": data["photoBase64"] as? String ?? "",
-                    "weight": data["weight"] as? String ?? "",
-                    "lifts": data["lifts"] as? [[String: Any]] ?? []
-                ]
-                
-                // Write retroactively in the background
-                Task {
-                    try? await db.collection("users").document(uid).collection("progress").document(initialEntryId).setData(progressData)
-                }
-                
-                // Add to local state so it shows up instantly without reloading
-                var retroLifts: [LiftRecord] = []
-                if let liftsDictArray = data["lifts"] as? [[String: Any]] {
-                    retroLifts = liftsDictArray.compactMap { dict in
-                        guard let n = dict["name"] as? String,
-                              let w = dict["weight"] as? Double,
-                              let r = dict["reps"] as? Int else { return nil }
-                        return LiftRecord(name: n, weight: w, reps: r)
-                    }
-                }
-                let ts = data["createdAt"] as? Timestamp
-                let retroEntry = ProgressEntry(
-                    id: initialEntryId,
-                    date: ts?.dateValue() ?? Date(),
-                    photoBase64: data["photoBase64"] as? String ?? "",
-                    weight: data["weight"] as? String ?? "",
-                    lifts: retroLifts
-                )
-                currentEntries = [retroEntry]
-            }
+            // Note: We removed the retroactive auto-population here!
+            // Auto-population now ONLY happens in createAccount() on first sign-up.
             
-            self.progressEntries = currentEntries
+            self.progressEntries = currentEntries.sorted(by: { $0.date < $1.date })
             self.height = data["height"] as? String ?? ""
             self.isHeightCm = data["isHeightCm"] as? Bool ?? true
             self.weight = data["weight"] as? String ?? ""

@@ -82,15 +82,6 @@
       }
     },
     {
-      "identity" : "irregulargradient",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/joogps/IrregularGradient.git",
-      "state" : {
-        "revision" : "84cbf2dd9ecf1e98e592e0718310f90fef52d6be",
-        "version" : "2.1.0"
-      }
-    },
-    {
       "identity" : "leveldb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/leveldb.git",

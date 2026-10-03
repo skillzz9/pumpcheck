@@ -3,6 +3,15 @@ import SwiftUI
 import UIKit
 #endif
 
+struct PostComment: Identifiable {
+    let id: String
+    let username: String
+    let photoBase64: String
+    let text: String
+    var isLiked: Bool
+    var likesCount: Int
+}
+
 struct FeedPost: Identifiable {
     let id: String
     let username: String
@@ -10,14 +19,21 @@ struct FeedPost: Identifiable {
     var kudos: Int
     var isKudoed: Bool
     var caption: String
+    var comments: [PostComment] = []
 }
 
 struct FeedView: View {
+    @Bindable var viewModel: OnboardingViewModel
+    
     @State private var posts: [FeedPost] = [
-        FeedPost(id: "1", username: "alex_fitness", imageName: "dummy1", kudos: 12, isKudoed: false, caption: "Crushed the morning workout! 💪"),
-        FeedPost(id: "2", username: "sarah_lifts", imageName: "dummy2", kudos: 45, isKudoed: true, caption: "Leg day is the best day. 🦵"),
-        FeedPost(id: "3", username: "mike_pump", imageName: "dummy3", kudos: 0, isKudoed: false, caption: "Rest day vibes.")
+        FeedPost(id: "1", username: "alex_fitness", imageName: "dummy1", kudos: 12, isKudoed: false, caption: "Crushed the morning workout! 💪", comments: [
+            PostComment(id: "c1", username: "gym_bro", photoBase64: "", text: "Looking huge man!", isLiked: false, likesCount: 2)
+        ]),
+        FeedPost(id: "2", username: "sarah_lifts", imageName: "dummy2", kudos: 45, isKudoed: true, caption: "Leg day is the best day. 🦵", comments: []),
+        FeedPost(id: "3", username: "mike_pump", imageName: "dummy3", kudos: 0, isKudoed: false, caption: "Rest day vibes.", comments: [])
     ]
+    
+    @State private var selectedPostId: String? = nil
     
     var body: some View {
         NavigationStack {
@@ -27,10 +43,19 @@ struct FeedView: View {
                 ScrollView {
                     LazyVStack(spacing: 24) {
                         ForEach($posts) { $post in
-                            FeedPostView(post: $post)
+                            FeedPostView(post: $post, selectedPostId: $selectedPostId)
                         }
                     }
                     .padding(.vertical)
+                }
+                
+                if let selectedId = selectedPostId, let index = posts.firstIndex(where: { $0.id == selectedId }) {
+                    CommentModalView(viewModel: viewModel, post: $posts[index], isPresented: Binding(
+                        get: { selectedPostId != nil },
+                        set: { if !$0 { selectedPostId = nil } }
+                    ))
+                    .transition(.move(edge: .trailing))
+                    .zIndex(1)
                 }
             }
             .navigationTitle("Feed")
@@ -44,6 +69,7 @@ struct FeedView: View {
 
 struct FeedPostView: View {
     @Binding var post: FeedPost
+    @Binding var selectedPostId: String?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -70,7 +96,9 @@ struct FeedPostView: View {
                 
                 // Comment Button
                 Button {
-                    // Future action for comment
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        selectedPostId = post.id
+                    }
                 } label: {
                     Image(systemName: "message")
                         .font(.system(size: 24))
