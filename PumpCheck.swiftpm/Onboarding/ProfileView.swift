@@ -208,11 +208,9 @@ struct ProfileView: View {
                 }
                 .padding(.horizontal, 24)
             }
-
+            .navigationDestination(isPresented: $navToStats) {
+                StatsView(username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
+            }
         }
     }
-    .navigationDestination(isPresented: $navToStats) {
-        StatsView(username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
-    }
-        }
 }
