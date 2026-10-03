@@ -21,6 +21,7 @@ struct FeedPost: Identifiable {
     let userId: String
     let username: String
     var photoBase64: String
+    var photos: [String] = [] // New array for multiple photos
     var kudos: Int
     var isKudoed: Bool
     var caption: String
@@ -132,12 +133,13 @@ struct FeedView: View {
                 let userId = data["userId"] as? String ?? ""
                 let username = data["username"] as? String ?? "Unknown"
                 let photoBase64 = data["photoBase64"] as? String ?? ""
+                let photos = data["photos"] as? [String] ?? (photoBase64.isEmpty ? [] : [photoBase64])
                 let caption = data["caption"] as? String ?? ""
                 let kudos = data["kudos"] as? Int ?? 0
                 let ts = data["date"] as? Timestamp
                 let date = ts?.dateValue() ?? Date()
                 
-                let post = FeedPost(id: id, userId: userId, username: username, photoBase64: photoBase64, kudos: kudos, isKudoed: false, caption: caption, date: date)
+                let post = FeedPost(id: id, userId: userId, username: username, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: false, caption: caption, date: date)
                 fetchedPosts.append(post)
             }
             
@@ -179,7 +181,20 @@ struct FeedPostView: View {
             .padding(.horizontal, 16)
             
             // Image area
-            if let data = Data(base64Encoded: post.photoBase64), let uiImage = UIImage(data: data) {
+            if post.photos.count > 1 {
+                TabView {
+                    ForEach(post.photos.indices, id: \.self) { idx in
+                        if let data = Data(base64Encoded: post.photos[idx]), let uiImage = UIImage(data: data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                        }
+                    }
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+                .aspectRatio(1.0, contentMode: .fit)
+                .clipped()
+            } else if let firstPhoto = post.photos.first, let data = Data(base64Encoded: firstPhoto), let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
