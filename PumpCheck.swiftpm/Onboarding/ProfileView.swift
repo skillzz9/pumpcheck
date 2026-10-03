@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import IrregularGradient
 
 struct ProfileView: View {
     var viewModel: OnboardingViewModel
@@ -104,9 +105,13 @@ struct ProfileView: View {
                     .padding(.bottom, 24)
                     .padding(.horizontal, 24)
                     .background(
-                        Color.white
-                            .padding(.top, -1000)
-                            .padding(.horizontal, -24)
+                        IrregularGradient(
+                            colors: [Color.white, Theme.accent.opacity(0.15), Color.blue.opacity(0.1), Color.white, Color.purple.opacity(0.1)],
+                            background: Color.white,
+                            speed: 4
+                        )
+                        .padding(.top, -1000)
+                        .padding(.horizontal, -24)
                     )
                     // Removed corner radius and offset padding so it acts as a sharp full-width block
                     

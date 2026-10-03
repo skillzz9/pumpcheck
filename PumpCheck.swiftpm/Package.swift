@@ -28,7 +28,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/EmergeTools/Pow", from: "1.0.0"),
-        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.0.0")
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.0.0"),
+        .package(url: "https://github.com/joogps/IrregularGradient.git", from: "2.1.0")
     ],
     targets: [
         .executableTarget(
@@ -37,7 +38,8 @@ let package = Package(
                 .product(name: "Pow", package: "Pow"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseStorage", package: "firebase-ios-sdk")
+                .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
+                .product(name: "IrregularGradient", package: "IrregularGradient")
             ],
             path: ".",
             sources: ["Onboarding", "PumpCheckApp.swift"],
