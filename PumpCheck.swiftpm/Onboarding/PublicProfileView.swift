@@ -15,9 +15,8 @@ struct PublicProfileView: View {
     @State private var proudestLifts: [LiftRecord] = []
     @State private var isLoading = true
     
-    @State private var showHeightChart = false
-    @State private var showWeightChart = false
-    @State private var selectedLiftChartName: String? = nil
+    @State private var navToStats: Bool = false
+    @State private var initialStatSelection: StatSelection = .height
     
     var body: some View {
         ZStack {
@@ -60,7 +59,7 @@ struct PublicProfileView: View {
                         // Stats row
                         HStack(spacing: 12) {
                             // Height Pill
-                            Button { showHeightChart = true } label: {
+                            Button { initialStatSelection = .height; navToStats = true } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "ruler.fill")
                                         .foregroundColor(Theme.accent)
@@ -76,7 +75,7 @@ struct PublicProfileView: View {
                             }
                             
                             // Weight Pill
-                            Button { showWeightChart = true } label: {
+                            Button { initialStatSelection = .weight; navToStats = true } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "scalemass.fill")
                                         .foregroundColor(Theme.accent)
@@ -124,7 +123,7 @@ struct PublicProfileView: View {
                             } else {
                                 VStack(spacing: 12) {
                                     ForEach(proudestLifts) { lift in
-                                        Button { selectedLiftChartName = lift.name } label: {
+                                        Button { initialStatSelection = .lift(lift.name); navToStats = true } label: {
                                             HStack {
                                                 Text(lift.name)
                                                     .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -155,35 +154,15 @@ struct PublicProfileView: View {
         .task {
             await fetchPublicProfile()
         }
-        .sheet(isPresented: $showHeightChart) {
-            StatChartView(title: "Height Over Time", data: generateFakeData(baseValue: Double(height) ?? 170.0, trend: 0.5))
+        .navigationDestination(isPresented: $navToStats) {
+            StatsView(username: username, heightStr: height, weightStr: weight, lifts: proudestLifts, selection: initialStatSelection)
         }
-        .sheet(isPresented: $showWeightChart) {
-            StatChartView(title: "Weight Over Time", data: generateFakeData(baseValue: Double(weight) ?? 75.0, trend: 1.2))
-        }
-        .sheet(isPresented: Binding(get: { selectedLiftChartName != nil }, set: { if !$0 { selectedLiftChartName = nil } })) {
-            if let name = selectedLiftChartName, let lift = proudestLifts.first(where: { $0.name == name }) {
-                StatChartView(title: "\(name) Progress", data: generateFakeData(baseValue: lift.weight - 20, trend: 5.0, increaseOnly: true))
-            }
-        }
+        
+        
+        
     }
     
-    private func generateFakeData(baseValue: Double, trend: Double, increaseOnly: Bool = false) -> [ChartDataPoint] {
-        var data: [ChartDataPoint] = []
-        var current = baseValue
-        let now = Date()
-        
-        for i in (0..<6).reversed() {
-            let date = Calendar.current.date(byAdding: .month, value: -i, to: now)!
-            data.append(ChartDataPoint(date: date, value: current))
-            if increaseOnly {
-                current += Double.random(in: 1.0...trend)
-            } else {
-                current += Double.random(in: -trend...trend)
-            }
-        }
-        return data
-    }
+    
     
     private func fetchPublicProfile() async {
         let db = Firestore.firestore()
@@ -217,68 +196,3 @@ struct PublicProfileView: View {
     }
 }
 
-struct ChartDataPoint: Identifiable {
-    let id = UUID()
-    let date: Date
-    let value: Double
-}
-
-struct StatChartView: View {
-    let title: String
-    let data: [ChartDataPoint]
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                Theme.pitchBlack.ignoresSafeArea()
-                
-                VStack(spacing: 24) {
-                    Chart(data) { point in
-                        LineMark(
-                            x: .value("Date", point.date),
-                            y: .value("Value", point.value)
-                        )
-                        .foregroundStyle(Theme.accent.gradient)
-                        .interpolationMethod(.catmullRom)
-                        
-                        AreaMark(
-                            x: .value("Date", point.date),
-                            y: .value("Value", point.value)
-                        )
-                        .foregroundStyle(LinearGradient(colors: [Theme.accent.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom))
-                        .interpolationMethod(.catmullRom)
-                        
-                        PointMark(
-                            x: .value("Date", point.date),
-                            y: .value("Value", point.value)
-                        )
-                        .foregroundStyle(Theme.accent)
-                    }
-                    .chartYAxis {
-                        AxisMarks(position: .leading) {
-                            AxisGridLine().foregroundStyle(Theme.taupeGrey.opacity(0.2))
-                            AxisValueLabel().foregroundStyle(Theme.textSecondary)
-                        }
-                    }
-                    .chartXAxis {
-                        AxisMarks(values: .stride(by: .month)) {
-                            AxisGridLine().foregroundStyle(Theme.taupeGrey.opacity(0.2))
-                            AxisValueLabel(format: .dateTime.month().year()).foregroundStyle(Theme.textSecondary)
-                        }
-                    }
-                    .frame(height: 300)
-                    .padding()
-                    .background(Theme.cardBackground)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                    
-                    Spacer()
-                }
-                .padding(.top, 40)
-            }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        .presentationDetents([.fraction(0.6)])
-    }
-}

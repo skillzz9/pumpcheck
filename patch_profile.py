@@ -1,33 +1,47 @@
-import re
-
-with open("PumpCheck.swiftpm/Onboarding/ProfileView.swift", "r") as f:
+with open("PumpCheckExpo/src/screens/ProfileView.tsx", "r") as f:
     content = f.read()
 
-# Add import
-if "import IrregularGradient" not in content:
-    content = content.replace("import SwiftUI\nimport FirebaseAuth", "import SwiftUI\nimport FirebaseAuth\nimport IrregularGradient")
+content = content.replace("export function ProfileView() {", """
+import { useAuth } from '../store/AuthContext';
 
-# Replace background
-target = """                    .background(
-                        Color.white
-                            .padding(.top, -1000)
-                            .padding(.horizontal, -24)
-                    )"""
+export function ProfileView() {
+  const { userData, logout } = useAuth();
+  
+  const MOCK_USER = {
+    username: userData?.username || "loading...",
+    height: userData?.height || "--",
+    isHeightCm: userData?.isHeightCm ?? true,
+    weight: userData?.weight || "--",
+    isWeightKg: userData?.isWeightKg ?? true,
+    kudos: userData?.kudos || 0,
+    proudestLifts: userData?.lifts || [],
+    goals: userData?.goals || [],
+    photoBase64: userData?.photoBase64 || ""
+  };
+""")
 
-replacement = """                    .background(
-                        IrregularGradient(
-                            colors: [Color.white, Theme.accent.opacity(0.15), Color.blue.opacity(0.1), Color.white, Color.purple.opacity(0.1)],
-                            background: Color.white,
-                            speed: 4
-                        )
-                        .padding(.top, -1000)
-                        .padding(.horizontal, -24)
-                    )"""
+content = content.replace("""const MOCK_USER = {
+  username: "alex_fitness",
+  height: "180",
+  isHeightCm: true,
+  weight: "75",
+  isWeightKg: true,
+  kudos: 124,
+  proudestLifts: [
+    { id: "1", name: "Bench Press", weight: 100, reps: 5 },
+    { id: "2", name: "Squat", weight: 140, reps: 3 },
+  ],
+  goals: ["Hit 200kg Deadlift", "Workout 4 days a week"]
+};""", "")
 
-if target in content:
-    content = content.replace(target, replacement)
-    with open("PumpCheck.swiftpm/Onboarding/ProfileView.swift", "w") as f:
-        f.write(content)
-    print("Patched ProfileView successfully!")
-else:
-    print("Target not found!")
+content = content.replace("""<Ionicons name="person" size={60} color="rgba(100, 88, 83, 0.5)" />""", """{MOCK_USER.photoBase64 ? (
+              <Image source={{ uri: `data:image/jpeg;base64,${MOCK_USER.photoBase64}` }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+            ) : (
+              <Ionicons name="person" size={60} color="rgba(100, 88, 83, 0.5)" />
+            )}""")
+
+content = content.replace("""<TouchableOpacity style={styles.logoutButton}>""", """<TouchableOpacity style={styles.logoutButton} onPress={logout}>""")
+
+with open("PumpCheckExpo/src/screens/ProfileView.tsx", "w") as f:
+    f.write(content)
+print("Patched ProfileView.tsx!")

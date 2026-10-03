@@ -5,9 +5,8 @@ import Charts
 struct ProfileView: View {
     var viewModel: OnboardingViewModel
     
-    @State private var showHeightChart = false
-    @State private var showWeightChart = false
-    @State private var selectedLiftChartName: String? = nil
+    @State private var navToStats: Bool = false
+    @State private var initialStatSelection: StatSelection = .height
     
     var body: some View {
         ZStack {
@@ -63,7 +62,7 @@ struct ProfileView: View {
                         
                         HStack(spacing: 12) {
                             // Height Pill
-                            Button { showHeightChart = true } label: {
+                            Button { initialStatSelection = .height; navToStats = true } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "ruler.fill")
                                         .foregroundColor(Theme.accent)
@@ -79,7 +78,7 @@ struct ProfileView: View {
                             }
                             
                             // Weight Pill
-                            Button { showWeightChart = true } label: {
+                            Button { initialStatSelection = .weight; navToStats = true } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "scalemass.fill")
                                         .foregroundColor(Theme.accent)
@@ -211,6 +210,7 @@ struct ProfileView: View {
 
         }
     }
+    .navigationDestination(isPresented: $navToStats) {
+        StatsView(username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
+    }
 }
-
-

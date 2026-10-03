@@ -4,28 +4,37 @@ import { Theme } from '../theme/Theme';
 import { Ionicons } from '@expo/vector-icons';
 
 // Mock data since we don't have Firebase hooked up yet
-const MOCK_USER = {
-  username: "alex_fitness",
-  height: "180",
-  isHeightCm: true,
-  weight: "75",
-  isWeightKg: true,
-  kudos: 124,
-  proudestLifts: [
-    { id: "1", name: "Bench Press", weight: 100, reps: 5 },
-    { id: "2", name: "Squat", weight: 140, reps: 3 },
-  ],
-  goals: ["Hit 200kg Deadlift", "Workout 4 days a week"]
-};
+
+
+
+import { useAuth } from '../store/AuthContext';
 
 export function ProfileView() {
+  const { userData, logout } = useAuth();
+  
+  const MOCK_USER = {
+    username: userData?.username || "loading...",
+    height: userData?.height || "--",
+    isHeightCm: userData?.isHeightCm ?? true,
+    weight: userData?.weight || "--",
+    isWeightKg: userData?.isWeightKg ?? true,
+    kudos: userData?.kudos || 0,
+    proudestLifts: userData?.lifts || [],
+    goals: userData?.goals || [],
+    photoBase64: userData?.photoBase64 || ""
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header section with white background */}
         <View style={styles.headerBlock}>
           <View style={styles.profileImageContainer}>
-            <Ionicons name="person" size={60} color="rgba(100, 88, 83, 0.5)" />
+            {MOCK_USER.photoBase64 ? (
+              <Image source={{ uri: `data:image/jpeg;base64,${MOCK_USER.photoBase64}` }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+            ) : (
+              <Ionicons name="person" size={60} color="rgba(100, 88, 83, 0.5)" />
+            )}
           </View>
           
           <Text style={styles.username}>@{MOCK_USER.username}</Text>
@@ -54,7 +63,7 @@ export function ProfileView() {
         {/* Lifts Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Proudest Lifts</Text>
-          {MOCK_USER.proudestLifts.map(lift => (
+          {MOCK_USER.proudestLifts.map(lift: any => (
             <View key={lift.id} style={styles.card}>
               <Text style={styles.liftName}>{lift.name}</Text>
               <Text style={styles.liftStats}>{lift.weight} × {lift.reps}</Text>
@@ -65,7 +74,7 @@ export function ProfileView() {
         {/* Goals Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Goals</Text>
-          {MOCK_USER.goals.map((goal, index) => (
+          {MOCK_USER.goals.map((goal: any, index: number) => (
             <View key={index} style={styles.cardRow}>
               <Ionicons name="checkmark-circle" size={20} color={Theme.accent} />
               <Text style={styles.goalText}>{goal}</Text>
@@ -74,7 +83,7 @@ export function ProfileView() {
         </View>
 
         {/* Logout */}
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
         
