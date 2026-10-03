@@ -12,6 +12,7 @@ struct CreatePostModalView: View {
     @State private var selectedImageData: Data? = nil
     @State private var caption: String = ""
     @State private var isPosting = false
+    @State private var errorMessage: String? = nil
     
     var body: some View {
         NavigationStack {
@@ -66,6 +67,13 @@ struct CreatePostModalView: View {
                                 .lineLimit(3...6)
                         }
                         .padding(.horizontal)
+                        
+                        if let error = errorMessage {
+                            Text(error)
+                                .font(.system(size: 14))
+                                .foregroundColor(.red)
+                                .padding(.horizontal)
+                        }
                         
                         // Submit Button
                         Button(action: createPost) {
@@ -138,6 +146,7 @@ struct CreatePostModalView: View {
                 print("Error creating post: \(error.localizedDescription)")
                 await MainActor.run {
                     isPosting = false
+                    errorMessage = "Firebase Error: \(error.localizedDescription). Check your Firestore Security Rules!"
                 }
             }
         }
