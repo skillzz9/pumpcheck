@@ -112,7 +112,7 @@ struct FeedView: View {
             await fetchPosts()
         }
         .sheet(isPresented: $showCreatePost) {
-            CreatePostModalView(isPresented: $showCreatePost, viewModel: viewModel, onPostCreated: {
+            CreatePostModalView(viewModel: viewModel, onPostCreated: {
                 Task {
                     await fetchPosts()
                 }

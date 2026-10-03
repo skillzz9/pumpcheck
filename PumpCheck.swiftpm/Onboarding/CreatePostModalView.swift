@@ -10,7 +10,8 @@ enum PostMode: String, CaseIterable {
 
 struct CreatePostModalView: View {
     @Bindable var viewModel: OnboardingViewModel
-    @Environment(\\.dismiss) var dismiss
+    var onPostCreated: () -> Void
+    @Environment(\.dismiss) var dismiss
     
     @State private var postMode: PostMode = .single
     
@@ -33,7 +34,7 @@ struct CreatePostModalView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         Picker("Post Mode", selection: $postMode) {
-                            ForEach(PostMode.allCases, id: \\.self) { mode in
+                            ForEach(PostMode.allCases, id: \.self) { mode in
                                 Text(mode.rawValue).tag(mode)
                             }
                         }
@@ -241,6 +242,7 @@ struct CreatePostModalView: View {
         db.collection("posts").document(postId).setData(postData) { error in
             isUploading = false
             if error == nil {
+                onPostCreated()
                 dismiss()
             }
         }
@@ -250,7 +252,7 @@ struct CreatePostModalView: View {
 struct CalendarPhotoPickerView: View {
     let allEntries: [ProgressEntry]
     @Binding var selectedEntries: [ProgressEntry]
-    @Environment(\\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     
     // Sort entries so latest is at the top in the picker
     private var sortedEntries: [ProgressEntry] {
