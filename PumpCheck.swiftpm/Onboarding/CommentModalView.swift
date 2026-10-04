@@ -7,6 +7,7 @@ struct CommentModalView: View {
     var onClose: () -> Void
     var onNavigateToProfile: (String, String) -> Void
     @State private var commentText: String = ""
+    @FocusState private var isInputFocused: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -103,11 +104,20 @@ struct CommentModalView: View {
                                             .foregroundColor(Theme.textPrimary)
                                     }
                                     
-                                    // Reply / likes count (optional instagram style)
-                                    if comment.likesCount > 0 {
-                                        Text("\(comment.likesCount) likes")
-                                            .font(.system(size: 12))
-                                            .foregroundColor(Theme.textSecondary)
+                                    HStack(spacing: 12) {
+                                        if comment.likesCount > 0 {
+                                            Text("\(comment.likesCount) likes")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(Theme.textSecondary)
+                                        }
+                                        Button {
+                                            commentText = "@\(comment.username) "
+                                            isInputFocused = true
+                                        } label: {
+                                            Text("Reply")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(Theme.textSecondary)
+                                        }
                                     }
                                 }
                                 
@@ -141,6 +151,7 @@ struct CommentModalView: View {
             HStack {
                 TextField("Add a comment...", text: $commentText)
                     .textFieldStyle(PumpTextFieldStyle())
+                    .focused($isInputFocused)
                 
                 Button {
                     let base64 = viewModel.profileImageData?.base64EncodedString() ?? ""

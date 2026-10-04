@@ -3,27 +3,27 @@ Command line invocation:
     /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme PumpCheck -destination "platform=iOS Simulator,name=iPhone 17 Pro" -derivedDataPath ../build
 
 Resolve Package Graph
-2026-10-05 10:28:36.313 xcodebuild[26145:14062729] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-05 10:39:36.069 xcodebuild[27013:14076771] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
 
 Resolve Package Graph
 
 
 Resolved source packages:
-  InteropForGoogle: https://github.com/google/interop-ios-for-google-sdks.git @ 100.0.0
-  GTMSessionFetcher: https://github.com/google/gtm-session-fetcher.git @ 3.5.0
-  GoogleDataTransport: https://github.com/google/GoogleDataTransport.git @ 9.4.0
-  Firebase: https://github.com/firebase/firebase-ios-sdk.git @ 10.29.0
-  PumpCheck: /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
-  GoogleAppMeasurement: https://github.com/google/GoogleAppMeasurement.git @ 10.28.0
-  AppCheck: https://github.com/google/app-check.git @ 10.19.2
-  gRPC: https://github.com/google/grpc-binary.git @ 1.62.2
   Promises: https://github.com/google/promises.git @ 2.4.1
+  leveldb: https://github.com/firebase/leveldb.git @ 1.22.5
+  AppCheck: https://github.com/google/app-check.git @ 10.19.2
   Pow: https://github.com/EmergeTools/Pow @ 1.0.6
-  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  GoogleAppMeasurement: https://github.com/google/GoogleAppMeasurement.git @ 10.28.0
   abseil: https://github.com/google/abseil-cpp-binary.git @ 1.2024011602.0
   GoogleUtilities: https://github.com/google/GoogleUtilities.git @ 7.13.3
+  InteropForGoogle: https://github.com/google/interop-ios-for-google-sdks.git @ 100.0.0
+  GoogleDataTransport: https://github.com/google/GoogleDataTransport.git @ 9.4.0
   nanopb: https://github.com/firebase/nanopb.git @ 2.30910.1
-  leveldb: https://github.com/firebase/leveldb.git @ 1.22.5
+  PumpCheck: /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
+  Firebase: https://github.com/firebase/firebase-ios-sdk.git @ 10.29.0
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  gRPC: https://github.com/google/grpc-binary.git @ 1.62.2
+  GTMSessionFetcher: https://github.com/google/gtm-session-fetcher.git @ 3.5.0
 
 ComputePackagePrebuildTargetDependencyGraph
 
@@ -305,8 +305,8 @@ ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeD
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
 
-Build description signature: b2ae93209f614ddeeffa2788f89cfbdd
-Build description path: /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/XCBuildData/b2ae93209f614ddeeffa2788f89cfbdd.xcbuilddata
+Build description signature: 5835c0921dd43ceb0985b9e5049a7f0a
+Build description path: /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/XCBuildData/5835c0921dd43ceb0985b9e5049a7f0a.xcbuilddata
 ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk /Users/hugoposthuma/Downloads/PumpCheck/build/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448f6cfe768891a92b912361537c460fe42b.sdkstatcache
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -o /Users/hugoposthuma/Downloads/PumpCheck/build/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448f6cfe768891a92b912361537c460fe42b.sdkstatcache
@@ -319,9 +319,21 @@ ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Product
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/nanopb
     builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/nanopb.build/Debug-iphonesimulator/nanopb_nanopb.build/empty-nanopb_nanopb.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/nanopb_nanopb.bundle/Info.plist
 
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_opensslWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_opensslWrapper.build/empty-gRPC_opensslWrapper.plist (in target 'gRPC_opensslWrapper' from project 'gRPC')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_opensslWrapper.build/empty-gRPC_opensslWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_opensslWrapper.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcppWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcppWrapper.build/empty-gRPC_grpcppWrapper.plist (in target 'gRPC_grpcppWrapper' from project 'gRPC')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcppWrapper.build/empty-gRPC_grpcppWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcppWrapper.bundle/Info.plist
+
 ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/abseil_abslWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/abseil.build/Debug-iphonesimulator/abseil_abslWrapper.build/empty-abseil_abslWrapper.plist (in target 'abseil_abslWrapper' from project 'abseil')
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/abseil-cpp-binary
     builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/abseil.build/Debug-iphonesimulator/abseil_abslWrapper.build/empty-abseil_abslWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/abseil_abslWrapper.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcWrapper.build/empty-gRPC_grpcWrapper.plist (in target 'gRPC_grpcWrapper' from project 'gRPC')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcWrapper.build/empty-gRPC_grpcWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcWrapper.bundle/Info.plist
 
 ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/Promises_FBLPromises.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/Promises.build/Debug-iphonesimulator/Promises_FBLPromises.build/empty-Promises_FBLPromises.plist (in target 'Promises_FBLPromises' from project 'Promises')
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/promises
@@ -331,26 +343,6 @@ ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Product
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
     builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-NSData.build/empty-GoogleUtilities_GoogleUtilities-NSData.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-NSData.bundle/Info.plist
 
-ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.build/empty-GoogleUtilities_GoogleUtilities-Logger.plist (in target 'GoogleUtilities_GoogleUtilities-Logger' from project 'GoogleUtilities')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
-    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.build/empty-GoogleUtilities_GoogleUtilities-Logger.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.bundle/Info.plist
-
-ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcWrapper.build/empty-gRPC_grpcWrapper.plist (in target 'gRPC_grpcWrapper' from project 'gRPC')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
-    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcWrapper.build/empty-gRPC_grpcWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcWrapper.bundle/Info.plist
-
-ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.build/empty-GoogleUtilities_GoogleUtilities-Environment.plist (in target 'GoogleUtilities_GoogleUtilities-Environment' from project 'GoogleUtilities')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
-    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.build/empty-GoogleUtilities_GoogleUtilities-Environment.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.bundle/Info.plist
-
-ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_opensslWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_opensslWrapper.build/empty-gRPC_opensslWrapper.plist (in target 'gRPC_opensslWrapper' from project 'gRPC')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
-    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_opensslWrapper.build/empty-gRPC_opensslWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_opensslWrapper.bundle/Info.plist
-
-ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcppWrapper.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcppWrapper.build/empty-gRPC_grpcppWrapper.plist (in target 'gRPC_grpcppWrapper' from project 'gRPC')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/grpc-binary
-    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/gRPC.build/Debug-iphonesimulator/gRPC_grpcppWrapper.build/empty-gRPC_grpcppWrapper.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/gRPC_grpcppWrapper.bundle/Info.plist
-
 ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.build/empty-GoogleUtilities_GoogleUtilities-Reachability.plist (in target 'GoogleUtilities_GoogleUtilities-Reachability' from project 'GoogleUtilities')
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
     builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.build/empty-GoogleUtilities_GoogleUtilities-Reachability.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Reachability.bundle/Info.plist
@@ -358,6 +350,14 @@ ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Product
 ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.build/empty-GoogleUtilities_GoogleUtilities-Network.plist (in target 'GoogleUtilities_GoogleUtilities-Network' from project 'GoogleUtilities')
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
     builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.build/empty-GoogleUtilities_GoogleUtilities-Network.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Network.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.build/empty-GoogleUtilities_GoogleUtilities-Logger.plist (in target 'GoogleUtilities_GoogleUtilities-Logger' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.build/empty-GoogleUtilities_GoogleUtilities-Logger.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Logger.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.build/empty-GoogleUtilities_GoogleUtilities-Environment.plist (in target 'GoogleUtilities_GoogleUtilities-Environment' from project 'GoogleUtilities')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
+    builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.build/empty-GoogleUtilities_GoogleUtilities-Environment.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-Environment.bundle/Info.plist
 
 ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/Info.plist /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/GoogleUtilities.build/Debug-iphonesimulator/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.build/empty-GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.plist (in target 'GoogleUtilities_GoogleUtilities-AppDelegateSwizzler' from project 'GoogleUtilities')
     cd /Users/hugoposthuma/Downloads/PumpCheck/build/SourcePackages/checkouts/GoogleUtilities
@@ -399,9 +399,9 @@ ProcessInfoPlistFile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Product
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
     builtin-infoPlistUtility /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/empty-PumpCheck.plist -producttype com.apple.product-type.application -genpkginfo /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/assetcatalog_generated_info.plist -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseAuth.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseCore.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseCoreExtension.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseCoreInternal.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Firebase_FirebaseFirestore.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/FirebaseFirestoreInternal.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/absl.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/grpc.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/grpcpp.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks/openssl_grpc.framework -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GTMSessionFetcher_GTMSessionFetcherCore.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Environment.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Logger.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-NSData.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Network.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/GoogleUtilities_GoogleUtilities-Reachability.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Pow_Pow.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Promises_FBLPromises.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/abseil_abslWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/gRPC_grpcWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/gRPC_grpcppWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/gRPC_opensslWrapper.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/leveldb_leveldb.bundle -scanforprivacyfile /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/nanopb_nanopb.bundle -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Info.plist
 
-SwiftCompile normal arm64 Compiling\ CreatePostModalView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/CreatePostModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
+SwiftCompile normal arm64 Compiling\ CommentModalView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/CommentModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
 
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/CreatePostModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
+SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/CommentModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
     
 
@@ -412,7 +412,6 @@ EmitSwiftModule normal arm64 (in target 'PumpCheck' from project 'PumpCheck')
     
 
 SwiftCompile normal arm64 Compiling\ FeedView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/FeedView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
 SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/FeedView.swift (in target 'PumpCheck' from project 'PumpCheck')
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
     
@@ -435,82 +434,9 @@ Copy /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesi
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck.abi.json /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.swiftmodule/arm64-apple-ios-simulator.abi.json
 
-SwiftDriverJobDiscovery normal arm64 Compiling FeedView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftDriverJobDiscovery normal arm64 Compiling CreatePostModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 Compiling\ StepViews.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/StepViews.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/StepViews.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftCompile normal arm64 Compiling\ ProgressTab.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/ProgressTab.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/ProgressTab.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftCompile normal arm64 Compiling\ ProgressDetailView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/ProgressDetailView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/ProgressDetailView.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftCompile normal arm64 Compiling\ ProfileView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/ProfileView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/ProfileView.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftCompile normal arm64 Compiling\ PublicProfileView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/PublicProfileView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/PublicProfileView.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftCompile normal arm64 Compiling\ OnboardingViewModel.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/OnboardingViewModel.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/OnboardingViewModel.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-/Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/OnboardingViewModel.swift:258:54: warning: conditional cast from '[QueryDocumentSnapshot]' to '[QueryDocumentSnapshot]' always succeeds
-            if let docs = progressSnapshot.documents as? [QueryDocumentSnapshot] {
-                                                     ^
-/Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/OnboardingViewModel.swift:290:34: warning: reference to captured var 'fetchedEntries' in concurrently-executing code; this is an error in the Swift 6 language mode
-            var currentEntries = fetchedEntries
-                                 ^
-/Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/OnboardingViewModel.swift:341:36: warning: reference to captured var 'fetchedEntries' in concurrently-executing code; this is an error in the Swift 6 language mode
-            self.progressEntries = fetchedEntries.sorted(by: { $0.date < $1.date })
-                                   ^
-
-SwiftCompile normal arm64 Compiling\ LogProgressModal.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/LogProgressModal.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/LogProgressModal.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftCompile normal arm64 Compiling\ CommentModalView.swift /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/CommentModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftCompile normal arm64 /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/Onboarding/CommentModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
-    
-
-SwiftDriverJobDiscovery normal arm64 Compiling ProgressDetailView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftDriverJobDiscovery normal arm64 Compiling PublicProfileView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
 SwiftDriverJobDiscovery normal arm64 Compiling CommentModalView.swift (in target 'PumpCheck' from project 'PumpCheck')
 
-SwiftDriverJobDiscovery normal arm64 Compiling ProgressTab.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftDriverJobDiscovery normal arm64 Compiling OnboardingViewModel.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftDriverJobDiscovery normal arm64 Compiling LogProgressModal.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftDriverJobDiscovery normal arm64 Compiling ProfileView.swift (in target 'PumpCheck' from project 'PumpCheck')
-
-SwiftDriverJobDiscovery normal arm64 Compiling StepViews.swift (in target 'PumpCheck' from project 'PumpCheck')
+SwiftDriverJobDiscovery normal arm64 Compiling FeedView.swift (in target 'PumpCheck' from project 'PumpCheck')
 
 SwiftDriver\ Compilation PumpCheck normal arm64 com.apple.xcode.tools.swift.compiler (in target 'PumpCheck' from project 'PumpCheck')
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm/.swiftpm/xcode
@@ -529,15 +455,15 @@ Ld /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimu
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator -L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/../lib -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck-ExecutorLinkFileList-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck.app-Simulated.xcent.der /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck
 
-ExtractAppIntentsMetadata (in target 'PumpCheck' from project 'PumpCheck')
-    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.HqwKN7/Metal.xctoolchain --module-name PumpCheck --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.pumpcheck.app --output /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck --dependency-file /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck_dependency_info.dat --stringsdata-file /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck.SwiftFileList --metadata-file-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck.DependencyMetadataFileList --static-metadata-file-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-10-05 10:29:41.355 appintentsmetadataprocessor[26468:14065889] Starting appintentsmetadataprocessor export
-2026-10-05 10:29:41.413 appintentsmetadataprocessor[26468:14065889] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
-
 CopySwiftLibs /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app (in target 'PumpCheck' from project 'PumpCheck')
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
     builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck.debug.dylib --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PlugIns --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/SystemExtensions --scan-folder /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Extensions --platform iphonesimulator --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.HqwKN7/Metal.xctoolchain --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'PumpCheck' from project 'PumpCheck')
+    cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.HqwKN7/Metal.xctoolchain --module-name PumpCheck --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.pumpcheck.app --output /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck --dependency-file /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck_dependency_info.dat --stringsdata-file /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck.SwiftFileList --metadata-file-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck.DependencyMetadataFileList --static-metadata-file-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/PumpCheck.DependencyStaticMetadataFileList --swift-const-vals-list /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Intermediates.noindex/PumpCheck.build/Debug-iphonesimulator/PumpCheck.build/Objects-normal/arm64/PumpCheck.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-10-05 10:39:56.656 appintentsmetadataprocessor[27206:14078303] Starting appintentsmetadataprocessor export
+2026-10-05 10:39:56.662 appintentsmetadataprocessor[27206:14078303] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
 
 CodeSign /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-iphonesimulator/PumpCheck.app/PumpCheck.debug.dylib (in target 'PumpCheck' from project 'PumpCheck')
     cd /Users/hugoposthuma/Downloads/PumpCheck/PumpCheck.swiftpm
@@ -568,5 +494,5 @@ Validate /Users/hugoposthuma/Downloads/PumpCheck/build/Build/Products/Debug-ipho
 ** BUILD SUCCEEDED **
 
 ✅ Build successful! Installing to simulator...
-com.pumpcheck.app: 26538
+com.pumpcheck.app: 27232
 🚀 Successfully launched on Simulator!
