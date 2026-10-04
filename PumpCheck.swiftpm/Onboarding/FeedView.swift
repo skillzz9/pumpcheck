@@ -20,6 +20,7 @@ struct FeedPost: Identifiable {
     let id: String
     let userId: String
     let username: String
+    var profilePictureBase64: String?
     var photoBase64: String
     var photos: [String] = [] // New array for multiple photos
     var kudos: Int
@@ -132,6 +133,7 @@ struct FeedView: View {
                 let id = data["id"] as? String ?? doc.documentID
                 let userId = data["userId"] as? String ?? ""
                 let username = data["username"] as? String ?? "Unknown"
+                let pfp = data["profilePictureBase64"] as? String
                 let photoBase64 = data["photoBase64"] as? String ?? ""
                 let photos = data["photos"] as? [String] ?? (photoBase64.isEmpty ? [] : [photoBase64])
                 let caption = data["caption"] as? String ?? ""
@@ -139,7 +141,7 @@ struct FeedView: View {
                 let ts = data["date"] as? Timestamp
                 let date = ts?.dateValue() ?? Date()
                 
-                let post = FeedPost(id: id, userId: userId, username: username, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: false, caption: caption, date: date)
+                let post = FeedPost(id: id, userId: userId, username: username, profilePictureBase64: pfp, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: false, caption: caption, date: date)
                 fetchedPosts.append(post)
             }
             
@@ -170,12 +172,8 @@ struct FeedPostView: View {
             // Header
             HStack {
                 Button { onNavigateToProfile(post.userId, post.username) } label: {
-                    HStack(spacing: 8) {
-                        Text(post.username)
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.textPrimary)
-                            
-                        if let data = profileImageData, let uiImage = UIImage(data: data) {
+                    HStack(spacing: 12) {
+                        if let pfp = post.profilePictureBase64, !pfp.isEmpty, let data = Data(base64Encoded: pfp), let uiImage = UIImage(data: data) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
@@ -191,6 +189,10 @@ struct FeedPostView: View {
                                         .foregroundColor(Theme.taupeGrey)
                                 )
                         }
+                        
+                        Text(post.username)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundColor(Theme.textPrimary)
                     }
                 }
                 .padding(.vertical, 8)
@@ -200,15 +202,7 @@ struct FeedPostView: View {
                     .foregroundColor(Theme.textSecondary)
             }
             .padding(.horizontal, 16)
-            .task {
-                let db = Firestore.firestore()
-                if let doc = try? await db.collection("users").document(post.userId).getDocument(),
-                   let data = doc.data(),
-                   let pfpStr = data["profilePictureBase64"] as? String,
-                   let imgData = Data(base64Encoded: pfpStr) {
-                    self.profileImageData = imgData
-                }
-            }
+
             
             // Image area
             if post.photos.count > 1 {

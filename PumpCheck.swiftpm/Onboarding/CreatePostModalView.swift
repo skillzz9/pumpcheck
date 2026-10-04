@@ -251,10 +251,15 @@ struct CreatePostModalView: View {
             
             let photos = processedPhotos
             
+            var pfpStr = ""
+            if let data = viewModel.profileImageData {
+                pfpStr = data.base64EncodedString()
+            }
             let postData: [String: Any] = [
                 "id": postId,
                 "userId": uid,
                 "username": viewModel.username,
+                "profilePictureBase64": pfpStr,
                 "photoBase64": photos.first ?? "",
                 "photos": photos,
                 "kudos": 0,
