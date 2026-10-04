@@ -188,12 +188,20 @@ struct FeedPostView: View {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                        } else {
+                            VStack {
+                                Text("Failed to load photo \(idx)").foregroundColor(.red)
+                            }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.black)
                         }
                     }
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+                .tabViewStyle(.page(indexDisplayMode: .always))
+                .frame(maxWidth: .infinity)
                 .aspectRatio(1.0, contentMode: .fit)
                 .clipped()
+                .background(Color.gray.opacity(0.1))
             } else if let firstPhoto = post.photos.first, let data = Data(base64Encoded: firstPhoto), let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
