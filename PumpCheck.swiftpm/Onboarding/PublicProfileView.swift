@@ -10,6 +10,9 @@ struct PublicProfileView: View {
     @State private var kudos: Int = 0
     @State private var height: String = ""
     @State private var weight: String = ""
+    @State private var age: String = ""
+    @State private var yearsLifted: String = ""
+    @State private var monthsLifted: String = ""
     @State private var isHeightCm: Bool = true
     @State private var isWeightKg: Bool = true
     @State private var proudestLifts: [LiftRecord] = []
@@ -51,9 +54,21 @@ struct PublicProfileView: View {
                                 }
                             }
                             
-                            Text(username)
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundColor(Theme.textPrimary)
+                            VStack(spacing: 4) {
+                                Text(username)
+                                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                                    .foregroundColor(Theme.textPrimary)
+                                
+                                let y = yearsLifted
+                                let m = monthsLifted
+                                let expStr = (!y.isEmpty && y != "0" ? "\(y)y " : "") + (!m.isEmpty && m != "0" ? "\(m)m " : "")
+                                let finalExp = expStr.isEmpty ? "Just started" : expStr + "lifting"
+                                let ageStr = age.isEmpty ? "" : "\(age)yo • "
+                                
+                                Text(ageStr + finalExp)
+                                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                                    .foregroundColor(Theme.textSecondary)
+                            }
                         }
                         
                         // Stats row
@@ -177,6 +192,9 @@ struct PublicProfileView: View {
                 kudos = data["kudos"] as? Int ?? 0
                 height = data["height"] as? String ?? ""
                 weight = data["weight"] as? String ?? ""
+                age = data["age"] as? String ?? ""
+                yearsLifted = data["yearsLifted"] as? String ?? ""
+                monthsLifted = data["monthsLifted"] as? String ?? ""
                 isHeightCm = data["isHeightCm"] as? Bool ?? true
                 isWeightKg = data["isWeightKg"] as? Bool ?? true
                 

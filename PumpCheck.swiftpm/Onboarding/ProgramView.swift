@@ -1,7 +1,11 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct ProgramView: View {
     @Bindable var viewModel: OnboardingViewModel
+    @State private var isSignedUp = false
+    @State private var isUpdating = false
     
     var body: some View {
         NavigationStack {
@@ -96,17 +100,30 @@ struct ProgramView: View {
                         
                         // CTA Button
                         Button {
-                            // Action coming soon
+                            if !isSignedUp && !isUpdating {
+                                signUpForEarlyAccess()
+                            }
                         } label: {
-                            Text("Generate Custom Program")
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundColor(Theme.pitchBlack)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Theme.accent)
-                                .cornerRadius(16)
-                                .shadow(color: Theme.accent.opacity(0.3), radius: 10, x: 0, y: 5)
+                            HStack(spacing: 8) {
+                                if isUpdating {
+                                    ProgressView().tint(Theme.pitchBlack)
+                                } else if isSignedUp {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 20))
+                                    Text("Signed Up!")
+                                } else {
+                                    Text("Sign Up for Early Access")
+                                }
+                            }
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(Theme.pitchBlack)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(isSignedUp ? Color.green : Theme.accent)
+                            .cornerRadius(16)
+                            .shadow(color: Theme.accent.opacity(0.3), radius: 10, x: 0, y: 5)
                         }
+                        .disabled(isSignedUp || isUpdating)
                         .padding(.horizontal, 24)
                         .padding(.top, 20)
                         
@@ -116,6 +133,43 @@ struct ProgramView: View {
             }
             .navigationTitle("Program")
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                checkSignUpStatus()
+            }
+        }
+    }
+    
+    private func checkSignUpStatus() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).getDocument { doc, _ in
+            if let data = doc?.data(), let signedUp = data["programSignUp"] as? Bool {
+                self.isSignedUp = signedUp
+            }
+        }
+    }
+    
+    private func signUpForEarlyAccess() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        isUpdating = true
+        let db = Firestore.firestore()
+        db.collection("users").document(uid).updateData([
+            "programSignUp": true
+        ]) { error in
+            isUpdating = false
+            if error == nil {
+                withAnimation {
+                    isSignedUp = true
+                }
+            } else {
+                // If it fails because the document doesn't have the field yet and rules prevent update? 
+                // Actually updateData works fine, but we can fallback to setData(merge:true)
+                db.collection("users").document(uid).setData(["programSignUp": true], merge: true) { _ in
+                    withAnimation {
+                        isSignedUp = true
+                    }
+                }
+            }
         }
     }
 }

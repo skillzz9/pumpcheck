@@ -57,9 +57,21 @@ struct ProfileView: View {
                             }
                         }
                         
-                        Text("@\(viewModel.username.isEmpty ? "username" : viewModel.username)")
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.pitchBlack)
+                        VStack(spacing: 4) {
+                            Text("@\(viewModel.username.isEmpty ? "username" : viewModel.username)")
+                                .font(.system(size: 24, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.pitchBlack)
+                            
+                            let y = viewModel.yearsLifted
+                            let m = viewModel.monthsLifted
+                            let expStr = (!y.isEmpty && y != "0" ? "\(y)y " : "") + (!m.isEmpty && m != "0" ? "\(m)m " : "")
+                            let finalExp = expStr.isEmpty ? "Just started" : expStr + "lifting"
+                            let ageStr = viewModel.age.isEmpty ? "" : "\(viewModel.age)yo • "
+                            
+                            Text(ageStr + finalExp)
+                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .foregroundColor(Theme.pitchBlack)
+                        }
                         
                         HStack(spacing: 12) {
                             // Height Pill
