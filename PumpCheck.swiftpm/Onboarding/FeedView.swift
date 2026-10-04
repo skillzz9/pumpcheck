@@ -161,47 +161,97 @@ struct FeedPostView: View {
     @Binding var selectedPostId: String?
     var onNavigateToProfile: (String, String) -> Void
     
+    @State private var profileImageData: Data? = nil
+    @State private var sliderValue: Double = 0
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             
             // Header
             HStack {
                 Button { onNavigateToProfile(post.userId, post.username) } label: {
-                    Text(post.username)
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.textPrimary)
-                .padding(.vertical, 8)
-                .padding(.trailing, 16)
+                    HStack(spacing: 8) {
+                        Text(post.username)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundColor(Theme.textPrimary)
+                            
+                        if let data = profileImageData, let uiImage = UIImage(data: data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 36, height: 36)
+                                .clipShape(Circle())
+                        } else {
+                            Circle()
+                                .fill(Theme.cardBackground)
+                                .frame(width: 36, height: 36)
+                                .overlay(
+                                    Image(systemName: "person.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(Theme.taupeGrey)
+                                )
+                        }
+                    }
                 }
+                .padding(.vertical, 8)
                 Spacer()
                 Text(post.date, style: .time)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
             }
             .padding(.horizontal, 16)
+            .task {
+                let db = Firestore.firestore()
+                if let doc = try? await db.collection("users").document(post.userId).getDocument(),
+                   let data = doc.data(),
+                   let pfpStr = data["profilePictureBase64"] as? String,
+                   let imgData = Data(base64Encoded: pfpStr) {
+                    self.profileImageData = imgData
+                }
+            }
             
             // Image area
             if post.photos.count > 1 {
-                TabView {
-                    ForEach(post.photos.indices, id: \.self) { idx in
-                        if let data = Data(base64Encoded: post.photos[idx]), let uiImage = UIImage(data: data) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .clipped()
-                        } else {
-                            VStack {
-                                Text("Failed to load photo \(idx)").foregroundColor(.red)
-                            }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.black)
+                VStack(spacing: 0) {
+                    let currentIndex = Int(sliderValue)
+                    if currentIndex >= 0 && currentIndex < post.photos.count,
+                       let data = Data(base64Encoded: post.photos[currentIndex]),
+                       let uiImage = UIImage(data: data) {
+                        
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .clipped()
+                            
+                    } else {
+                        Rectangle()
+                            .fill(Theme.cardBackground)
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .overlay(
+                                Text("Photo error").foregroundColor(Theme.taupeGrey)
+                            )
+                    }
+                    
+                    // The Flicker Slider
+                    VStack(spacing: 4) {
+                        Slider(value: $sliderValue, in: 0...Double(post.photos.count - 1), step: 1.0)
+                            .tint(Theme.accent)
+                        
+                        HStack {
+                            Text("Earliest")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(Theme.taupeGrey)
+                            Spacer()
+                            Text("Latest")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(Theme.taupeGrey)
                         }
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .frame(maxWidth: .infinity)
-                .aspectRatio(1.0, contentMode: .fit)
-                .clipped()
-                .background(Color.gray.opacity(0.1))
             } else if let firstPhoto = post.photos.first, let data = Data(base64Encoded: firstPhoto), let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
