@@ -92,6 +92,11 @@ struct CreatePostModalView: View {
             .sheet(isPresented: $showCalendarPicker) {
                 CalendarPhotoPickerView(allEntries: viewModel.progressEntries, selectedEntries: $selectedProgressEntries)
             }
+            .alert("Upload Failed", isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
         }
     }
     
@@ -225,7 +230,19 @@ struct CreatePostModalView: View {
         } else {
             // Sort by date (earliest to latest)
             let sorted = selectedProgressEntries.sorted(by: { $0.date < $1.date })
-            photos = sorted.map { $0.photoBase64 }.filter { !$0.isEmpty }
+            // Aggressively re-compress to ensure multiple photos fit in 1MB Firestore limit
+            for entry in sorted {
+                if let data = Data(base64Encoded: entry.photoBase64),
+                   let uiImg = UIImage(data: data) {
+                    
+                    let resized = uiImg.size.width > 600 ? uiImg.resized(toWidth: 600) ?? uiImg : uiImg
+                    if let compressed = resized.jpegData(compressionQuality: 0.3) {
+                        photos.append(compressed.base64EncodedString())
+                    } else {
+                        photos.append(entry.photoBase64)
+                    }
+                }
+            }
         }
         
         let postData: [String: Any] = [
@@ -241,7 +258,11 @@ struct CreatePostModalView: View {
         
         db.collection("posts").document(postId).setData(postData) { error in
             isUploading = false
-            if error == nil {
+            if let error = error {
+                print("Firebase Error: \(error.localizedDescription)")
+                self.errorMessage = error.localizedDescription
+                self.showErrorAlert = true
+            } else {
                 onPostCreated()
                 dismiss()
             }
@@ -313,5 +334,16 @@ struct CalendarPhotoPickerView: View {
                 }
             }
         }
+    }
+}
+
+
+extension UIImage {
+    func resized(toWidth width: CGFloat) -> UIImage? {
+        let canvasSize = CGSize(width: width, height: CGFloat(ceil(width/size.width * size.height)))
+        UIGraphicsBeginImageContextWithOptions(canvasSize, false, scale)
+        defer { UIGraphicsEndImageContext() }
+        draw(in: CGRect(origin: .zero, size: canvasSize))
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
 }

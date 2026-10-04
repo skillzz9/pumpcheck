@@ -136,18 +136,20 @@ struct ProfileView: View {
                         } else {
                             VStack(spacing: 12) {
                                 ForEach(viewModel.proudestLifts) { lift in
-                                    HStack {
-                                        Text(lift.name)
-                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                            .foregroundColor(Theme.textPrimary)
-                                        Spacer()
-                                        Text("\(lift.weight, specifier: "%.1f") × \(lift.reps)")
-                                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                                            .foregroundColor(Theme.accent)
+                                    Button { initialStatSelection = .lift(lift.name); navToStats = true } label: {
+                                        HStack {
+                                            Text(lift.name)
+                                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                                .foregroundColor(Theme.textPrimary)
+                                            Spacer()
+                                            Text("\(lift.weight, specifier: "%.1f") × \(lift.reps)")
+                                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                                .foregroundColor(Theme.accent)
+                                        }
+                                        .padding()
+                                        .background(Theme.cardBackground)
+                                        .cornerRadius(16)
                                     }
-                                    .padding()
-                                    .background(Theme.cardBackground)
-                                    .cornerRadius(16)
                                 }
                             }
                         }
