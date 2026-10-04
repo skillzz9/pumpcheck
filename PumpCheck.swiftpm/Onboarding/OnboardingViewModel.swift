@@ -15,6 +15,7 @@ struct LiftRecord: Identifiable, Hashable, Codable {
 @Observable
 class OnboardingViewModel {
     // Step 1
+    var age: String = ""
     var height: String = ""
     var isHeightCm: Bool = true
     var weight: String = ""
@@ -163,6 +164,7 @@ class OnboardingViewModel {
             
             let dataToSave: [String: Any] = [
                 "username": username,
+                "age": age,
                 "height": height,
                 "isHeightCm": isHeightCm,
                 "weight": weight,
@@ -315,6 +317,7 @@ class OnboardingViewModel {
             // Auto-population now ONLY happens in createAccount() on first sign-up.
             
             self.progressEntries = currentEntries.sorted(by: { $0.date < $1.date })
+            self.age = data["age"] as? String ?? ""
             self.height = data["height"] as? String ?? ""
             self.isHeightCm = data["isHeightCm"] as? Bool ?? true
             self.weight = data["weight"] as? String ?? ""

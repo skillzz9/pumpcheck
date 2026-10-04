@@ -175,6 +175,16 @@ struct Step2View: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
+                Text("Age")
+                    .font(.subheadline)
+                    .foregroundColor(Theme.textSecondary)
+                
+                TextField("e.g. 25", text: $viewModel.age)
+                    .keyboardType(.numberPad)
+                    .textFieldStyle(PumpTextFieldStyle())
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Height")
                         .font(.subheadline)

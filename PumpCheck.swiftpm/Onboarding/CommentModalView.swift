@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 struct CommentModalView: View {
     @Bindable var viewModel: OnboardingViewModel
@@ -168,7 +169,21 @@ struct CommentModalView: View {
                     withAnimation {
                         post.comments.append(newComment)
                     }
+                    let savedText = commentText
                     commentText = ""
+                    
+                    let db = Firestore.firestore()
+                    let commentData: [String: Any] = [
+                        "id": newComment.id,
+                        "userId": newComment.userId,
+                        "username": newComment.username,
+                        "photoBase64": newComment.photoBase64,
+                        "text": savedText,
+                        "likesCount": 0
+                    ]
+                    db.collection("posts").document(post.id).updateData([
+                        "comments": FieldValue.arrayUnion([commentData])
+                    ])
                 } label: {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 24))

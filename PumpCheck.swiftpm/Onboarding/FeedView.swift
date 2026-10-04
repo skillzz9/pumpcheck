@@ -141,7 +141,21 @@ struct FeedView: View {
                 let ts = data["date"] as? Timestamp
                 let date = ts?.dateValue() ?? Date()
                 
-                let post = FeedPost(id: id, userId: userId, username: username, profilePictureBase64: pfp, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: false, caption: caption, date: date)
+                var parsedComments: [PostComment] = []
+                if let rawComments = data["comments"] as? [[String: Any]] {
+                    for c in rawComments {
+                        let cId = c["id"] as? String ?? UUID().uuidString
+                        let cUserId = c["userId"] as? String ?? ""
+                        let cUsername = c["username"] as? String ?? ""
+                        let cPhoto = c["photoBase64"] as? String ?? ""
+                        let cText = c["text"] as? String ?? ""
+                        let cLikes = c["likesCount"] as? Int ?? 0
+                        parsedComments.append(PostComment(id: cId, userId: cUserId, username: cUsername, photoBase64: cPhoto, text: cText, isLiked: false, likesCount: cLikes))
+                    }
+                }
+                
+                var post = FeedPost(id: id, userId: userId, username: username, profilePictureBase64: pfp, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: false, caption: caption, date: date)
+                post.comments = parsedComments
                 fetchedPosts.append(post)
             }
             
