@@ -106,6 +106,7 @@ struct FeedView: View {
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(Theme.accent)
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .toolbar(selectedPostId == nil ? .visible : .hidden, for: .navigationBar)
@@ -393,19 +394,27 @@ struct FeedPostView: View {
                 post.kudos -= 1
                 post.isKudoed = false
                 if !uid.isEmpty {
-                    db.collection("posts").document(postId).updateData([
+                    db.collection("posts").document(postId).setData([
                         "kudos": FieldValue.increment(Int64(-1)),
                         "kudoedBy": FieldValue.arrayRemove([uid])
-                    ])
+                    ], merge: true)
+                    
+                    db.collection("users").document(post.userId).setData([
+                        "kudos": FieldValue.increment(Int64(-1))
+                    ], merge: true)
                 }
             } else {
                 post.kudos += 1
                 post.isKudoed = true
                 if !uid.isEmpty {
-                    db.collection("posts").document(postId).updateData([
+                    db.collection("posts").document(postId).setData([
                         "kudos": FieldValue.increment(Int64(1)),
                         "kudoedBy": FieldValue.arrayUnion([uid])
-                    ])
+                    ], merge: true)
+                    
+                    db.collection("users").document(post.userId).setData([
+                        "kudos": FieldValue.increment(Int64(1))
+                    ], merge: true)
                 }
             }
         }
