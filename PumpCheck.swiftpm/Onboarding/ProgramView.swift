@@ -130,6 +130,7 @@ struct ProgramView: View {
                         
                         Spacer(minLength: 40)
                     }
+                    .padding(.bottom, 120)
                 }
             }
             .navigationTitle("Program")

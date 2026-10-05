@@ -166,7 +166,7 @@ struct PublicProfileView: View {
                         Spacer(minLength: 40)
                     }
                     .padding(.top, 40)
-                    .padding(.bottom, 100)
+                    .padding(.bottom, 120)
                 }
             }
         }

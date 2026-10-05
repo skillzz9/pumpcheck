@@ -60,7 +60,8 @@ struct FeedView: View {
                             )
                         }
                     }
-                    .padding(.vertical)
+                    .padding(.top, 16)
+                    .padding(.bottom, 120)
                 }
                 
                 if let selectedId = selectedPostId, let index = posts.firstIndex(where: { $0.id == selectedId }) {
