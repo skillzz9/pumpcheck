@@ -1,4 +1,6 @@
-import SwiftUI
+import re
+
+code = """import SwiftUI
 
 struct MainTabView: View {
     @Bindable var viewModel: OnboardingViewModel
@@ -101,3 +103,9 @@ struct TabBarItem: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+"""
+
+with open("PumpCheck.swiftpm/Onboarding/MainTabView.swift", "w") as f:
+    f.write(code)
+
+print("Patched MainTabView successfully!")

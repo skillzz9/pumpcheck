@@ -20,7 +20,7 @@ struct Theme {
     
     static let accent = deepBlue
     static let textPrimary = paleSky
-    static let textSecondary = paleSky.opacity(0.7)
+    static let textSecondary = taupeGrey
 }
 
 struct PumpTextFieldStyle: TextFieldStyle {
