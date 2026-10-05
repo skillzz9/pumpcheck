@@ -42,11 +42,12 @@ struct CommentModalView: View {
             
             // Image (1/3 of screen)
             GeometryReader { geo in
-                if let data = Data(base64Encoded: post.photoBase64), let uiImage = UIImage(data: data) {
+                if let uiImage = ImageCache.decode(base64: post.photoBase64) {
                     Image(uiImage: uiImage)
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                         .frame(width: geo.size.width, height: geo.size.height)
+                        .background(Theme.pitchBlack)
                         .clipped()
                 } else {
                     Rectangle()
@@ -76,7 +77,7 @@ struct CommentModalView: View {
                                 HStack(alignment: .top, spacing: 12) {
                                 // Profile picture
                                 Group {
-                                    if !comment.photoBase64.isEmpty, let imgData = Data(base64Encoded: comment.photoBase64), let uiImage = UIImage(data: imgData) {
+                                    if !comment.photoBase64.isEmpty, let uiImage = ImageCache.decode(base64: comment.photoBase64) {
                                         Image(uiImage: uiImage)
                                             .resizable()
                                             .scaledToFill()
@@ -149,7 +150,7 @@ struct CommentModalView: View {
                                 ForEach($comment.replies) { $reply in
                                     HStack(alignment: .top, spacing: 12) {
                                         Group {
-                                            if !reply.photoBase64.isEmpty, let imgData = Data(base64Encoded: reply.photoBase64), let uiImage = UIImage(data: imgData) {
+                                            if !reply.photoBase64.isEmpty, let uiImage = ImageCache.decode(base64: reply.photoBase64) {
                                                 Image(uiImage: uiImage)
                                                     .resizable()
                                                     .scaledToFill()

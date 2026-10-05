@@ -16,6 +16,7 @@ struct PublicProfileView: View {
     @State private var isHeightCm: Bool = true
     @State private var isWeightKg: Bool = true
     @State private var proudestLifts: [LiftRecord] = []
+    @State private var progressPhotos: [String] = []
     @State private var isLoading = true
     
     @State private var navToStats: Bool = false
@@ -158,6 +159,10 @@ struct PublicProfileView: View {
                         }
                         .padding(.horizontal, 24)
                         
+                        // Progress Flicker Gallery
+                        ProgressFlickerGallery(photos: progressPhotos)
+                            .padding(.horizontal, 24)
+                        
                         Spacer(minLength: 40)
                     }
                     .padding(.top, 40)
@@ -207,6 +212,17 @@ struct PublicProfileView: View {
                     }
                 }
             }
+            
+            // Fetch progress photos
+            let progressSnapshot = try await db.collection("users").document(userId).collection("progress").order(by: "date", descending: false).getDocuments()
+            var pPhotos: [String] = []
+            for pDoc in progressSnapshot.documents {
+                if let photoStr = pDoc.data()["photoBase64"] as? String, !photoStr.isEmpty {
+                    pPhotos.append(photoStr)
+                }
+            }
+            progressPhotos = pPhotos
+            
         } catch {
             print("Error fetching profile: \(error)")
         }

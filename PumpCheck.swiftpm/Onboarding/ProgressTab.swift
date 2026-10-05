@@ -12,6 +12,7 @@ struct ProgressEntry: Identifiable, Codable {
 struct ProgressTab: View {
     @Bindable var viewModel: OnboardingViewModel
     @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var sliderValue: Double = 0
     @State private var selectedImageData: Data? = nil
     @State private var showLogModal = false
     @State private var isProcessingPhoto = false
@@ -22,47 +23,110 @@ struct ProgressTab: View {
         ZStack {
             Theme.bgGradient.ignoresSafeArea()
             
-            VStack {
-                Text("Progress")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
-                
-                // Upload button
-                Button {
-                    showAccuracyWarning = true
-                } label: {
-                    VStack(spacing: 12) {
-                        if isProcessingPhoto {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: Theme.accent))
-                                .scaleEffect(1.5)
-                            Text("Processing...")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .padding(.top, 8)
-                        } else {
-                            Image(systemName: "camera.fill")
-                                .font(.system(size: 32))
-                            Text("Upload Most Recent Physique")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Progress")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(Theme.textPrimary)
+                    
+                    Spacer()
+                    
+                    if isProcessingPhoto {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Theme.accent))
+                    } else {
+                        Button {
+                            showAccuracyWarning = true
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(Theme.accent)
+                                .padding(8)
                         }
                     }
-                    .foregroundColor(Theme.paleSky)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 32)
-                    .background(Theme.textBoxBlue)
-                    .cornerRadius(16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Theme.accent.opacity(0.5), style: StrokeStyle(lineWidth: 2, dash: [8]))
-                    )
                 }
-                .disabled(isProcessingPhoto)
                 .padding(.horizontal, 24)
-                .padding(.top, 16)
-                .onChange(of: selectedItem) { _, newItem in
+                .padding(.top, 24)
+                .padding(.bottom, 16)
+                
+                ScrollView {
+                    // New Large Photo Slider
+                    let sortedEntries = viewModel.progressEntries.sorted(by: { $0.date < $1.date })
+                    if !sortedEntries.isEmpty {
+                        VStack(spacing: 0) {
+                            let currentIndex = min(max(Int(round(sliderValue)), 0), sortedEntries.count - 1)
+                            let currentEntry = sortedEntries[currentIndex]
+                            
+                            if let uiImage = ImageCache.decode(base64: currentEntry.photoBase64) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(maxWidth: .infinity)
+                                    .aspectRatio(1.0, contentMode: .fit)
+                                    .clipped()
+                            } else {
+                                Rectangle()
+                                    .fill(Theme.cardBackground)
+                                    .aspectRatio(1.0, contentMode: .fit)
+                            }
+                            
+                            if sortedEntries.count > 1 {
+                                VStack(spacing: 8) {
+                                    GeometryReader { geo in
+                                        let trackWidth = geo.size.width - 28
+                                        let percentage = CGFloat(sliderValue / Double(sortedEntries.count - 1))
+                                        let thumbX = 14 + (percentage * trackWidth)
+                                        
+                                        Text(currentEntry.date.formatted(.dateTime.year().month().day()))
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(Theme.taupeGrey)
+                                            .position(x: thumbX, y: geo.size.height / 2)
+                                    }
+                                    .frame(height: 14)
+                                    
+                                    Slider(value: $sliderValue, in: 0...Double(sortedEntries.count - 1), onEditingChanged: { editing in
+                                        if !editing {
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                                sliderValue = round(sliderValue)
+                                            }
+                                        }
+                                    })
+                                    .tint(Theme.accent)
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 12)
+                                .background(Theme.pitchBlack)
+                            } else {
+                                Text(currentEntry.date.formatted(.dateTime.year().month().day()))
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(Theme.taupeGrey)
+                                    .padding(.vertical, 12)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Theme.pitchBlack)
+                            }
+                        }
+                        .padding(.bottom, 16)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "photo.on.rectangle")
+                                .font(.system(size: 40))
+                                .foregroundColor(Theme.taupeGrey.opacity(0.5))
+                            Text("No progress photos yet. Tap + to upload.")
+                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .foregroundColor(Theme.textSecondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                        .background(Theme.cardBackground)
+                        .cornerRadius(16)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 16)
+                    }
+                    
+                    // The .onChange for uploading photo must be attached somewhere.
+                    // We'll attach it to the VStack or ScrollView below.
+                    EmptyView()
+                        .onChange(of: selectedItem) { _, newItem in
                     guard let newItem = newItem else { return }
                     isProcessingPhoto = true
                     Task {
@@ -82,14 +146,13 @@ struct ProgressTab: View {
                     }
                 }
                 
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                         ForEach(viewModel.progressEntries.reversed()) { entry in
                             Button(action: {
                                 selectedEntry = entry
                             }) {
                                 ZStack(alignment: .bottomLeading) {
-                                    if let data = Data(base64Encoded: entry.photoBase64), let uiImage = UIImage(data: data) {
+                                    if let uiImage = ImageCache.decode(base64: entry.photoBase64) {
                                         Image(uiImage: uiImage)
                                             .resizable()
                                             .scaledToFill()

@@ -167,6 +167,10 @@ struct ProfileView: View {
                         }
                     }
                     
+                    // Progress Flicker Gallery
+                    let photoArray = viewModel.progressEntries.sorted(by: { $0.date < $1.date }).map { $0.photoBase64 }.filter { !$0.isEmpty }
+                    ProgressFlickerGallery(photos: photoArray)
+                    
                     // Goals
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Goals")
@@ -228,4 +232,74 @@ struct ProfileView: View {
         }
     }
 }
+}
+
+struct ProgressFlickerGallery: View {
+    let photos: [String] // Array of base64 strings
+    @State private var sliderValue: Double = 0
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Physique Progress")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundColor(Theme.textPrimary)
+            
+            if photos.isEmpty {
+                Text("No progress photos yet.")
+                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                    .foregroundColor(Theme.textSecondary)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.cardBackground)
+                    .cornerRadius(16)
+            } else {
+                VStack(spacing: 0) {
+                    let currentIndex = Int(sliderValue)
+                    if currentIndex >= 0 && currentIndex < photos.count,
+                       let data = Data(base64Encoded: photos[currentIndex]),
+                       let uiImage = UIImage(data: data) {
+                        
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .clipped()
+                            
+                    } else {
+                        Rectangle()
+                            .fill(Theme.cardBackground)
+                            .aspectRatio(1.0, contentMode: .fit)
+                    }
+                    
+                    if photos.count > 1 {
+                        VStack(spacing: 4) {
+                            Slider(value: $sliderValue, in: 0...Double(photos.count - 1), step: 1.0)
+                                .tint(Theme.accent)
+                            
+                            HStack {
+                                Text("Earliest")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(Theme.taupeGrey)
+                                Spacer()
+                                Text("Latest")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(Theme.taupeGrey)
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                    } else {
+                        Text("1 Photo")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(Theme.taupeGrey)
+                            .padding(.vertical, 12)
+                    }
+                }
+                .background(Color.black.opacity(0.2))
+                .cornerRadius(16)
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
+            }
+        }
+    }
 }

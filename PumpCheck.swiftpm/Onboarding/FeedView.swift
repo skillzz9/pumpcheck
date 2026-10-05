@@ -98,6 +98,27 @@ struct FeedView: View {
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        Task {
+                            let db = Firestore.firestore()
+                            if let snap = try? await db.collection("posts").getDocuments() {
+                                for doc in snap.documents {
+                                    try? await db.collection("posts").document(doc.documentID).delete()
+                                }
+                            }
+                            await fetchPosts()
+                        }
+                    }) {
+                        Text("Clear All")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.red)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(8)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showCreatePost = true }) {
                         Image(systemName: "plus")
@@ -109,6 +130,7 @@ struct FeedView: View {
                     }
                 }
             }
+            .toolbar(selectedPostId == nil ? .visible : .hidden, for: .navigationBar)
         }
         .task {
             await fetchPosts()
@@ -206,7 +228,7 @@ struct FeedPostView: View {
                                 .scaledToFill()
                                 .frame(width: 36, height: 36)
                                 .clipShape(Circle())
-                        } else if let pfp = post.profilePictureBase64, !pfp.isEmpty, let data = Data(base64Encoded: pfp), let uiImage = UIImage(data: data) {
+                        } else if let pfp = post.profilePictureBase64, !pfp.isEmpty, let uiImage = ImageCache.decode(base64: pfp) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
@@ -240,10 +262,9 @@ struct FeedPostView: View {
             // Image area
             if post.photos.count > 1 {
                 VStack(spacing: 0) {
-                    let currentIndex = Int(sliderValue)
+                    let currentIndex = Int(round(sliderValue))
                     if currentIndex >= 0 && currentIndex < post.photos.count,
-                       let data = Data(base64Encoded: post.photos[currentIndex]),
-                       let uiImage = UIImage(data: data) {
+                       let uiImage = ImageCache.decode(base64: post.photos[currentIndex]) {
                         
                         Image(uiImage: uiImage)
                             .resizable()
@@ -263,7 +284,13 @@ struct FeedPostView: View {
                     
                     // The Flicker Slider
                     VStack(spacing: 4) {
-                        Slider(value: $sliderValue, in: 0...Double(post.photos.count - 1), step: 1.0)
+                        Slider(value: $sliderValue, in: 0...Double(post.photos.count - 1), onEditingChanged: { editing in
+                            if !editing {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    sliderValue = round(sliderValue)
+                                }
+                            }
+                        })
                             .tint(Theme.accent)
                         
                         HStack {
@@ -279,7 +306,7 @@ struct FeedPostView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                 }
-            } else if let firstPhoto = post.photos.first, let data = Data(base64Encoded: firstPhoto), let uiImage = UIImage(data: data) {
+            } else if let firstPhoto = post.photos.first, let uiImage = ImageCache.decode(base64: firstPhoto) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
