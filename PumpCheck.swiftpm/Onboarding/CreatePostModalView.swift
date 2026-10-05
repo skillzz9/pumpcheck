@@ -45,11 +45,16 @@ struct CreatePostModalView: View {
                         .padding(.horizontal)
                         .padding(.top, 16)
                         
-                        if postMode == .single {
-                            singleModeView
-                        } else {
-                            progressModeView
+                        ZStack(alignment: .top) {
+                            if postMode == .single {
+                                singleModeView
+                                    .transition(.asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .leading)))
+                            } else {
+                                progressModeView
+                                    .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
+                            }
                         }
+                        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: postMode)
                         
                         // Caption
                         VStack(alignment: .leading, spacing: 8) {

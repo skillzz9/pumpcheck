@@ -64,26 +64,6 @@ struct FeedView: View {
                     .padding(.bottom, 120)
                 }
                 
-                if let selectedId = selectedPostId, let index = posts.firstIndex(where: { $0.id == selectedId }) {
-                    CommentModalView(
-                        viewModel: viewModel, 
-                        post: $posts[index], 
-                        onClose: {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                selectedPostId = nil
-                            }
-                        },
-                        onNavigateToProfile: { uid, uname in
-                            selectedPostId = nil
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                navToProfileId = uid
-                                navToProfileName = uname
-                            }
-                        }
-                    )
-                    .transition(.move(edge: .trailing))
-                    .zIndex(1)
-                }
             }
             .navigationTitle("Feed")
             .navigationBarTitleDisplayMode(.inline)
@@ -123,11 +103,8 @@ struct FeedView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showCreatePost = true }) {
                         Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 24, weight: .bold))
                             .foregroundColor(Theme.accent)
-                            .padding(8)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
                     }
                 }
             }
@@ -142,6 +119,27 @@ struct FeedView: View {
                     await fetchPosts()
                 }
             })
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { selectedPostId != nil },
+            set: { if !$0 { selectedPostId = nil } }
+        )) {
+            if let selectedId = selectedPostId, let index = posts.firstIndex(where: { $0.id == selectedId }) {
+                CommentModalView(
+                    viewModel: viewModel, 
+                    post: $posts[index], 
+                    onClose: {
+                        selectedPostId = nil
+                    },
+                    onNavigateToProfile: { uid, uname in
+                        selectedPostId = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            navToProfileId = uid
+                            navToProfileName = uname
+                        }
+                    }
+                )
+            }
         }
     }
     
@@ -162,6 +160,9 @@ struct FeedView: View {
                 let photos = data["photos"] as? [String] ?? (photoBase64.isEmpty ? [] : [photoBase64])
                 let caption = data["caption"] as? String ?? ""
                 let kudos = data["kudos"] as? Int ?? 0
+                let kudoedBy = data["kudoedBy"] as? [String] ?? []
+                let currentUid = Auth.auth().currentUser?.uid ?? ""
+                let isKudoed = kudoedBy.contains(currentUid)
                 let ts = data["date"] as? Timestamp
                 let date = ts?.dateValue() ?? Date()
                 
@@ -190,7 +191,7 @@ struct FeedView: View {
                     }
                 }
                 
-                var post = FeedPost(id: id, userId: userId, username: username, profilePictureBase64: pfp, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: false, caption: caption, date: date)
+                var post = FeedPost(id: id, userId: userId, username: username, profilePictureBase64: pfp, photoBase64: photoBase64, photos: photos, kudos: kudos, isKudoed: isKudoed, caption: caption, date: date)
                 post.comments = parsedComments
                 fetchedPosts.append(post)
             }
@@ -383,13 +384,30 @@ struct FeedPostView: View {
         impactMed.impactOccurred()
         #endif
         
+        let db = Firestore.firestore()
+        let uid = Auth.auth().currentUser?.uid ?? ""
+        let postId = post.id
+        
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
             if post.isKudoed {
                 post.kudos -= 1
+                post.isKudoed = false
+                if !uid.isEmpty {
+                    db.collection("posts").document(postId).updateData([
+                        "kudos": FieldValue.increment(Int64(-1)),
+                        "kudoedBy": FieldValue.arrayRemove([uid])
+                    ])
+                }
             } else {
                 post.kudos += 1
+                post.isKudoed = true
+                if !uid.isEmpty {
+                    db.collection("posts").document(postId).updateData([
+                        "kudos": FieldValue.increment(Int64(1)),
+                        "kudoedBy": FieldValue.arrayUnion([uid])
+                    ])
+                }
             }
-            post.isKudoed.toggle()
         }
     }
 }

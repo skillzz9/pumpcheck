@@ -253,7 +253,12 @@ struct CommentModalView: View {
                         cDict["replies"] = rDicts
                         return cDict
                     }
-                    db.collection("posts").document(post.id).updateData(["comments": dicts])
+                    db.collection("posts").document(post.id).setData(["comments": dicts], merge: true) { error in
+                        if let error = error {
+                            print("Firebase Comment Save Error: \(error.localizedDescription)")
+                            // Fallback to updating the whole post just in case the post was deleted?
+                        }
+                    }
                 } label: {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 24))
