@@ -9,6 +9,7 @@ struct CommentModalView: View {
     var onNavigateToProfile: (String, String) -> Void
     @State private var commentText: String = ""
     @FocusState private var isInputFocused: Bool
+    @State private var replyingToId: String? = nil
     
     var body: some View {
         VStack(spacing: 0) {
@@ -71,7 +72,8 @@ struct CommentModalView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                     } else {
                         ForEach($post.comments) { $comment in
-                            HStack(alignment: .top, spacing: 12) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack(alignment: .top, spacing: 12) {
                                 // Profile picture
                                 Group {
                                     if !comment.photoBase64.isEmpty, let imgData = Data(base64Encoded: comment.photoBase64), let uiImage = UIImage(data: imgData) {
@@ -112,6 +114,7 @@ struct CommentModalView: View {
                                                 .foregroundColor(Theme.textSecondary)
                                         }
                                         Button {
+                                            replyingToId = comment.id
                                             commentText = "@\(comment.username) "
                                             isInputFocused = true
                                         } label: {
@@ -141,6 +144,64 @@ struct CommentModalView: View {
                                 }
                                 .padding(.top, 2)
                             }
+                            
+                            if !comment.replies.isEmpty {
+                                ForEach($comment.replies) { $reply in
+                                    HStack(alignment: .top, spacing: 12) {
+                                        Group {
+                                            if !reply.photoBase64.isEmpty, let imgData = Data(base64Encoded: reply.photoBase64), let uiImage = UIImage(data: imgData) {
+                                                Image(uiImage: uiImage)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 28, height: 28)
+                                                    .clipShape(Circle())
+                                            } else {
+                                                Circle()
+                                                    .fill(Theme.taupeGrey.opacity(0.5))
+                                                    .frame(width: 28, height: 28)
+                                                    .overlay(
+                                                        Text(String(reply.username.prefix(1).uppercased()))
+                                                            .font(.system(size: 12, weight: .bold))
+                                                            .foregroundColor(Theme.textPrimary)
+                                                    )
+                                            }
+                                        }
+                                        
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            HStack(alignment: .top, spacing: 4) {
+                                                Button { onNavigateToProfile(reply.userId, reply.username) } label: {
+                                                    Text(reply.username)
+                                                        .font(.system(size: 13, weight: .bold))
+                                                        .foregroundColor(Theme.textPrimary)
+                                                }
+                                                Text(reply.text)
+                                                    .font(.system(size: 13))
+                                                    .foregroundColor(Theme.textPrimary)
+                                            }
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        Button {
+                                            withAnimation {
+                                                if reply.isLiked {
+                                                    reply.likesCount -= 1
+                                                } else {
+                                                    reply.likesCount += 1
+                                                }
+                                                reply.isLiked.toggle()
+                                            }
+                                        } label: {
+                                            Image(systemName: reply.isLiked ? "heart.fill" : "heart")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(reply.isLiked ? Theme.accent : Theme.textSecondary)
+                                        }
+                                        .padding(.top, 2)
+                                    }
+                                    .padding(.leading, 48)
+                                }
+                            }
+                        }
                         }
                     }
                 }
@@ -166,24 +227,32 @@ struct CommentModalView: View {
                         isLiked: false,
                         likesCount: 0
                     )
+                    
                     withAnimation {
-                        post.comments.append(newComment)
+                        if let repId = replyingToId, let idx = post.comments.firstIndex(where: { $0.id == repId }) {
+                            post.comments[idx].replies.append(newComment)
+                        } else {
+                            post.comments.append(newComment)
+                        }
                     }
-                    let savedText = commentText
+                    
+                    replyingToId = nil
                     commentText = ""
                     
                     let db = Firestore.firestore()
-                    let commentData: [String: Any] = [
-                        "id": newComment.id,
-                        "userId": newComment.userId,
-                        "username": newComment.username,
-                        "photoBase64": newComment.photoBase64,
-                        "text": savedText,
-                        "likesCount": 0
-                    ]
-                    db.collection("posts").document(post.id).updateData([
-                        "comments": FieldValue.arrayUnion([commentData])
-                    ])
+                    let dicts = post.comments.map { c -> [String: Any] in
+                        var cDict: [String: Any] = [
+                            "id": c.id, "userId": c.userId, "username": c.username,
+                            "photoBase64": c.photoBase64, "text": c.text, "likesCount": c.likesCount
+                        ]
+                        let rDicts = c.replies.map { r -> [String: Any] in
+                            ["id": r.id, "userId": r.userId, "username": r.username,
+                             "photoBase64": r.photoBase64, "text": r.text, "likesCount": r.likesCount]
+                        }
+                        cDict["replies"] = rDicts
+                        return cDict
+                    }
+                    db.collection("posts").document(post.id).updateData(["comments": dicts])
                 } label: {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 24))

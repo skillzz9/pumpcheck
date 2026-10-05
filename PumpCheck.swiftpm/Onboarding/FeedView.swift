@@ -11,6 +11,7 @@ struct PostComment: Identifiable {
     let text: String
     var isLiked: Bool
     var likesCount: Int
+    var replies: [PostComment] = []
 }
 
 import FirebaseFirestore
@@ -150,7 +151,19 @@ struct FeedView: View {
                         let cPhoto = c["photoBase64"] as? String ?? ""
                         let cText = c["text"] as? String ?? ""
                         let cLikes = c["likesCount"] as? Int ?? 0
-                        parsedComments.append(PostComment(id: cId, userId: cUserId, username: cUsername, photoBase64: cPhoto, text: cText, isLiked: false, likesCount: cLikes))
+                        var cReplies: [PostComment] = []
+                        if let rawReplies = c["replies"] as? [[String: Any]] {
+                            for r in rawReplies {
+                                let rId = r["id"] as? String ?? UUID().uuidString
+                                let rUserId = r["userId"] as? String ?? ""
+                                let rUsername = r["username"] as? String ?? ""
+                                let rPhoto = r["photoBase64"] as? String ?? ""
+                                let rText = r["text"] as? String ?? ""
+                                let rLikes = r["likesCount"] as? Int ?? 0
+                                cReplies.append(PostComment(id: rId, userId: rUserId, username: rUsername, photoBase64: rPhoto, text: rText, isLiked: false, likesCount: rLikes, replies: []))
+                            }
+                        }
+                        parsedComments.append(PostComment(id: cId, userId: cUserId, username: cUsername, photoBase64: cPhoto, text: cText, isLiked: false, likesCount: cLikes, replies: cReplies))
                     }
                 }
                 
@@ -187,7 +200,13 @@ struct FeedPostView: View {
             HStack {
                 Button { onNavigateToProfile(post.userId, post.username) } label: {
                     HStack(spacing: 12) {
-                        if let pfp = post.profilePictureBase64, !pfp.isEmpty, let data = Data(base64Encoded: pfp), let uiImage = UIImage(data: data) {
+                        if let data = profileImageData, let uiImage = UIImage(data: data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 36, height: 36)
+                                .clipShape(Circle())
+                        } else if let pfp = post.profilePictureBase64, !pfp.isEmpty, let data = Data(base64Encoded: pfp), let uiImage = UIImage(data: data) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
@@ -195,12 +214,12 @@ struct FeedPostView: View {
                                 .clipShape(Circle())
                         } else {
                             Circle()
-                                .fill(Theme.cardBackground)
+                                .fill(Theme.taupeGrey.opacity(0.5))
                                 .frame(width: 36, height: 36)
                                 .overlay(
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(Theme.taupeGrey)
+                                    Text(String(post.username.prefix(1).uppercased()))
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(Theme.textPrimary)
                                 )
                         }
                         

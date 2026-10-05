@@ -16,6 +16,7 @@ struct ProgressTab: View {
     @State private var showLogModal = false
     @State private var isProcessingPhoto = false
     @State private var selectedEntry: ProgressEntry? = nil
+    @State private var showAccuracyWarning = false
     
     var body: some View {
         ZStack {
@@ -30,7 +31,9 @@ struct ProgressTab: View {
                     .padding(.top, 24)
                 
                 // Upload button
-                PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
+                Button {
+                    showAccuracyWarning = true
+                } label: {
                     VStack(spacing: 12) {
                         if isProcessingPhoto {
                             ProgressView()
@@ -124,6 +127,9 @@ struct ProgressTab: View {
                 }
             }
         }
+        .sheet(isPresented: $showAccuracyWarning) {
+            AccuracyWarningModal(selectedItem: $selectedItem)
+        }
         .sheet(item: $selectedEntry) { entry in
             ProgressDetailView(initialEntry: entry, allEntries: viewModel.progressEntries, isWeightKg: viewModel.isWeightKg) { selectedEntry = nil }
         }
@@ -145,5 +151,57 @@ struct ProgressTab: View {
                 )
             }
         }
+    }
+}
+
+
+struct AccuracyWarningModal: View {
+    @Binding var selectedItem: PhotosPickerItem?
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        ZStack {
+            Theme.pitchBlack.ignoresSafeArea()
+            
+            VStack(spacing: 32) {
+                Image(systemName: "camera.metering.spot")
+                    .font(.system(size: 60))
+                    .foregroundColor(Theme.accent)
+                
+                Text("Consistency is Key")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundColor(Theme.textPrimary)
+                
+                Text("Make sure you take a picture in the same lighting and the same place to make the AI analysis as accurate as possible.")
+                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                    .foregroundColor(Theme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                    .lineSpacing(4)
+                
+                PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
+                    Text("I understand")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(Theme.pitchBlack)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Theme.accent)
+                        .cornerRadius(16)
+                        .padding(.horizontal, 32)
+                }
+                .onChange(of: selectedItem) { _, newItem in
+                    if newItem != nil {
+                        dismiss()
+                    }
+                }
+                
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(Theme.textSecondary)
+                .padding(.top, -8)
+            }
+        }
+        .presentationDetents([.fraction(0.6)])
     }
 }
