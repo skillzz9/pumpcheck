@@ -257,8 +257,15 @@ struct CreatePostModalView: View {
             let photos = processedPhotos
             
             var pfpStr = ""
-            if let data = viewModel.profileImageData {
-                pfpStr = data.base64EncodedString()
+            if let data = viewModel.profileImageData, let uiImage = UIImage(data: data) {
+                let targetSize = CGSize(width: 100, height: 100)
+                UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
+                uiImage.draw(in: CGRect(origin: .zero, size: targetSize))
+                let resized = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                if let compressedData = resized?.jpegData(compressionQuality: 0.2) {
+                    pfpStr = compressedData.base64EncodedString()
+                }
             }
             let postData: [String: Any] = [
                 "id": postId,
