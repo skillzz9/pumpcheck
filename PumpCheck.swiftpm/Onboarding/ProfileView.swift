@@ -50,7 +50,7 @@ struct ProfileView: View {
                                 .clipShape(Capsule())
                                 .overlay(
                                     Capsule()
-                                        .stroke(Color.white, lineWidth: 2)
+                                        .stroke(Theme.paleSky, lineWidth: 2)
                                 )
                                 .shadow(color: Theme.accent.opacity(0.3), radius: 3, x: 0, y: 2)
                                 .offset(x: 45, y: -55)
@@ -125,7 +125,7 @@ struct ProfileView: View {
                     .padding(.bottom, 24)
                     .padding(.horizontal, 24)
                     .background(
-                        Color.white
+                        Theme.paleSky
                         .padding(.top, -1000)
                         .padding(.horizontal, -24)
                     )
@@ -296,7 +296,7 @@ struct ProgressFlickerGallery: View {
                             .padding(.vertical, 12)
                     }
                 }
-                .background(Color.black.opacity(0.2))
+                .background(Theme.pitchBlack.opacity(0.2))
                 .cornerRadius(16)
                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
             }

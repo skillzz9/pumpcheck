@@ -262,7 +262,7 @@ struct Step3View: View {
                 .cornerRadius(16)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.05), lineWidth: 1)
+                        .stroke(Theme.paleSky.opacity(0.05), lineWidth: 1)
                 )
             }
             
@@ -297,7 +297,7 @@ struct Step4View: View {
                         }
                 }
                 .padding(16)
-                .background(Color.white)
+                .background(Theme.paleSky)
                 .cornerRadius(16)
                 .foregroundColor(Theme.pitchBlack)
                 .environment(\.colorScheme, .light)

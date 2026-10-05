@@ -186,7 +186,7 @@ struct CreatePostModalView: View {
                                     } label: {
                                         Image(systemName: "minus.circle.fill")
                                             .foregroundColor(.red)
-                                            .background(Circle().fill(Color.white))
+                                            .background(Circle().fill(Theme.paleSky))
                                             .padding(6)
                                     }
                                 }
@@ -328,7 +328,7 @@ struct CalendarPhotoPickerView: View {
                                     if isSelected {
                                         Image(systemName: "checkmark.circle.fill")
                                             .foregroundColor(Theme.accent)
-                                            .background(Circle().fill(Color.black.opacity(0.6)))
+                                            .background(Circle().fill(Theme.pitchBlack.opacity(0.6)))
                                             .padding(6)
                                     }
                                 }

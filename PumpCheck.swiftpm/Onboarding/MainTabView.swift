@@ -40,7 +40,7 @@ struct MainTabView: View {
             
             let itemAppearance = UITabBarItemAppearance()
             itemAppearance.selected.iconColor = .white
-            itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+            itemAppearance.selected.titleTextAttributes = [.foregroundColor: UITheme.paleSky]
             itemAppearance.normal.iconColor = UIColor(Theme.paleSky).withAlphaComponent(0.5)
             itemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Theme.paleSky).withAlphaComponent(0.5)]
             
