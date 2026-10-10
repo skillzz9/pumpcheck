@@ -6,3 +6,10 @@ build/
 xcuserdata/
 DerivedData/
 .swiftpm/xcode/
+PumpCheck.swiftpm/Onboarding/Secrets.swift
+
+# Build output
+build-release/
+
+# Scripts with API keys
+test_anthropic*.sh

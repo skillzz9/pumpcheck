@@ -21,6 +21,12 @@ struct Theme {
     static let accent = deepBlue
     static let textPrimary = paleSky
     static let textSecondary = taupeGrey
+    
+    // Warning state, e.g. over the calorie goal on a cut
+    static let overLimit = Color(red: 220/255.0, green: 68/255.0, blue: 55/255.0)
+    
+    // Sign-up / login flow buttons use Blue Fantastic instead of Burning Flame
+    static let signUpButton = textBoxBlue
 }
 
 struct PumpTextFieldStyle: TextFieldStyle {
@@ -39,14 +45,18 @@ struct PumpTextFieldStyle: TextFieldStyle {
 }
 
 extension View {
-    func pumpButtonStyle(isPrimary: Bool = true) -> some View {
+    func signUpButtonStyle() -> some View {
+        pumpButtonStyle(isPrimary: true, primaryColor: Theme.signUpButton, primaryTextColor: Theme.paleSky, glow: false)
+    }
+    
+    func pumpButtonStyle(isPrimary: Bool = true, primaryColor: Color = Theme.accent, primaryTextColor: Color = Theme.pitchBlack, glow: Bool = true) -> some View {
         self
             .font(.system(size: 18, weight: .bold, design: .rounded))
-            .foregroundColor(isPrimary ? Theme.pitchBlack : Theme.paleSky)
+            .foregroundColor(isPrimary ? primaryTextColor : Theme.paleSky)
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity)
-            .background(isPrimary ? Theme.accent : Theme.cardBackground)
+            .background(isPrimary ? primaryColor : Theme.cardBackground)
             .cornerRadius(16)
-            .shadow(color: isPrimary ? Theme.accent.opacity(0.2) : .clear, radius: 8, x: 0, y: 4)
+            .shadow(color: isPrimary && glow ? primaryColor.opacity(0.2) : .clear, radius: 8, x: 0, y: 4)
     }
 }

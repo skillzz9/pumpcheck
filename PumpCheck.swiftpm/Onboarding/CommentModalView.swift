@@ -267,17 +267,9 @@ struct CommentModalView: View {
                         return cDict
                     }
                     db.collection("posts").document(post.id).setData(["comments": dicts], merge: true) { error in
-                        if let error = error {
-                            self.errorMessage = error.localizedDescription
+                        if error != nil {
+                            self.errorMessage = "Your comment couldn't be posted. Check your connection and try again."
                             self.showErrorAlert = true
-                        } else {
-                            // verify read
-                            db.collection("posts").document(post.id).getDocument { doc, err in
-                                if let err = err {
-                                    self.errorMessage = "Saved, but failed to read back: \(err.localizedDescription)"
-                                    self.showErrorAlert = true
-                                }
-                            }
                         }
                     }
                 } label: {
@@ -292,7 +284,7 @@ struct CommentModalView: View {
             .padding(.bottom, 10) // Extra padding for safe area on newer iPhones if needed
         }
         .background(Theme.pitchBlack.ignoresSafeArea())
-        .alert("Firebase Error", isPresented: $showErrorAlert, presenting: errorMessage) { _ in
+        .alert("Comment Not Posted", isPresented: $showErrorAlert, presenting: errorMessage) { _ in
             Button("OK", role: .cancel) { }
         } message: { msg in
             Text(msg)

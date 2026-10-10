@@ -68,11 +68,11 @@ struct LoginView: View {
                 }) {
                     if viewModel.isLoggingIn {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Theme.pitchBlack))
-                            .pumpButtonStyle(isPrimary: true)
+                            .progressViewStyle(CircularProgressViewStyle(tint: Theme.paleSky))
+                            .signUpButtonStyle()
                     } else {
                         Text("Login")
-                            .pumpButtonStyle(isPrimary: true)
+                            .signUpButtonStyle()
                     }
                 }
                 .disabled(viewModel.isLoggingIn || viewModel.email.isEmpty || viewModel.password.isEmpty)

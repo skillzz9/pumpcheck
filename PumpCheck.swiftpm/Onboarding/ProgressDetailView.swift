@@ -5,12 +5,18 @@ struct ProgressDetailView: View {
     let allEntries: [ProgressEntry]
     let isWeightKg: Bool
     var onDismiss: () -> Void
+    var onDelete: (ProgressEntry) async throws -> Void
     
-    init(initialEntry: ProgressEntry, allEntries: [ProgressEntry], isWeightKg: Bool, onDismiss: @escaping () -> Void) {
+    @State private var showDeleteConfirm = false
+    @State private var isDeleting = false
+    @State private var deleteError: String? = nil
+    
+    init(initialEntry: ProgressEntry, allEntries: [ProgressEntry], isWeightKg: Bool, onDismiss: @escaping () -> Void, onDelete: @escaping (ProgressEntry) async throws -> Void) {
         self._currentEntry = State(initialValue: initialEntry)
         self.allEntries = allEntries
         self.isWeightKg = isWeightKg
         self.onDismiss = onDismiss
+        self.onDelete = onDelete
     }
     
     var currentIndex: Int {
@@ -54,11 +60,12 @@ struct ProgressDetailView: View {
                         .padding(.horizontal, 24)
                         .padding(.bottom, -8) // Pull it slightly closer to the image
                         
-                        if let data = Data(base64Encoded: currentEntry.photoBase64), let uiImage = UIImage(data: data) {
+                        if let uiImage = ImageCache.decode(base64: currentEntry.photoBase64) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(maxWidth: .infinity)
+                                .background(Theme.pitchBlack)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .padding(.horizontal, 24)
                         }
@@ -114,6 +121,17 @@ struct ProgressDetailView: View {
             .navigationTitle(currentEntry.date.formatted(date: .abbreviated, time: .omitted))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showDeleteConfirm = true }) {
+                        if isDeleting {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                    }
+                    .disabled(isDeleting)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         onDismiss()
@@ -121,6 +139,34 @@ struct ProgressDetailView: View {
                     .fontWeight(.bold)
                     .foregroundColor(Theme.accent)
                 }
+            }
+            .confirmationDialog("Delete this progress photo?", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
+                Button("Delete", role: .destructive) {
+                    let entry = currentEntry
+                    isDeleting = true
+                    Task {
+                        do {
+                            try await onDelete(entry)
+                            await MainActor.run {
+                                isDeleting = false
+                                onDismiss()
+                            }
+                        } catch {
+                            await MainActor.run {
+                                isDeleting = false
+                                deleteError = error.localizedDescription
+                            }
+                        }
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This removes the photo from your progress gallery. This can't be undone.")
+            }
+            .alert("Couldn't delete photo", isPresented: Binding(get: { deleteError != nil }, set: { if !$0 { deleteError = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(deleteError ?? "")
             }
         }
     }

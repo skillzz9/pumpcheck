@@ -12,17 +12,19 @@ let package = Package(
             name: "PumpCheck",
             targets: ["AppModule"],
             bundleIdentifier: "com.pumpcheck.app",
-            teamIdentifier: "",
+            teamIdentifier: "KV7SXRJ72Z",
             displayVersion: "1.0",
             bundleVersion: "1",
             appIcon: .asset("AppIcon"),
             accentColor: .presetColor(.cyan),
             supportedDeviceFamilies: [
-                .pad,
                 .phone
             ],
             supportedInterfaceOrientations: [
                 .portrait
+            ],
+            capabilities: [
+                .camera(purposeString: "PumpCheck uses the camera to take guided physique scans.")
             ]
         )
     ],

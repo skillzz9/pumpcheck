@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import ImageIO
 
 struct ProgressEntry: Identifiable, Codable {
     var id: String = UUID().uuidString
@@ -13,6 +14,7 @@ struct ProgressTab: View {
     @Bindable var viewModel: OnboardingViewModel
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var sliderValue: Double = 0
+    @AppStorage(ProgressSliderMode.storageKey) private var sliderMode: ProgressSliderMode = .flicker
     @State private var selectedImageData: Data? = nil
     @State private var showLogModal = false
     @State private var isProcessingPhoto = false
@@ -57,18 +59,12 @@ struct ProgressTab: View {
                             let currentIndex = min(max(Int(round(sliderValue)), 0), sortedEntries.count - 1)
                             let currentEntry = sortedEntries[currentIndex]
                             
-                            if let uiImage = ImageCache.decode(base64: currentEntry.photoBase64) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(maxWidth: .infinity)
-                                    .aspectRatio(1.0, contentMode: .fit)
-                                    .clipped()
-                            } else {
-                                Rectangle()
-                                    .fill(Theme.cardBackground)
-                                    .aspectRatio(1.0, contentMode: .fit)
-                            }
+                            ProgressPhotoStack(photos: sortedEntries.map(\.photoBase64), sliderValue: sliderValue, mode: sliderMode)
+                                .overlay(alignment: .topTrailing) {
+                                    if sortedEntries.count > 1 {
+                                        ProgressSliderModeToggle(mode: $sliderMode)
+                                    }
+                                }
                             
                             if sortedEntries.count > 1 {
                                 VStack(spacing: 8) {
@@ -85,7 +81,7 @@ struct ProgressTab: View {
                                     .frame(height: 14)
                                     
                                     Slider(value: $sliderValue, in: 0...Double(sortedEntries.count - 1), onEditingChanged: { editing in
-                                        if !editing {
+                                        if !editing && sliderMode == .flicker {
                                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                                 sliderValue = round(sliderValue)
                                             }
@@ -157,12 +153,12 @@ struct ProgressTab: View {
                                             .resizable()
                                             .scaledToFill()
                                             .frame(minWidth: 0, maxWidth: .infinity)
-                                            .aspectRatio(1, contentMode: .fit)
+                                            .aspectRatio(9.0 / 16.0, contentMode: .fit)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                     } else {
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(Theme.cardBackground)
-                                            .aspectRatio(1, contentMode: .fit)
+                                            .aspectRatio(9.0 / 16.0, contentMode: .fit)
                                     }
                                     
                                     LinearGradient(colors: [.black.opacity(0.8), .clear], startPoint: .bottom, endPoint: .center)
@@ -194,13 +190,20 @@ struct ProgressTab: View {
             AccuracyWarningModal(selectedItem: $selectedItem)
         }
         .sheet(item: $selectedEntry) { entry in
-            ProgressDetailView(initialEntry: entry, allEntries: viewModel.progressEntries, isWeightKg: viewModel.isWeightKg) { selectedEntry = nil }
+            ProgressDetailView(
+                initialEntry: entry,
+                allEntries: viewModel.progressEntries,
+                isWeightKg: viewModel.isWeightKg,
+                onDismiss: { selectedEntry = nil },
+                onDelete: { try await viewModel.deleteProgressEntry($0) }
+            )
         }
         .sheet(isPresented: $showLogModal) {
             if let data = selectedImageData, let uiImage = UIImage(data: data) {
                 LogProgressModal(
                     viewModel: viewModel,
                     uiImage: uiImage,
+                    initialDate: extractDate(from: data) ?? Date(),
                     onSave: {
                         selectedItem = nil
                         selectedImageData = nil
@@ -267,4 +270,24 @@ struct AccuracyWarningModal: View {
         }
         .presentationDetents([.fraction(0.6)])
     }
+}
+
+func extractDate(from data: Data) -> Date? {
+    guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+    guard let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] else { return nil }
+    
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
+    
+    if let exif = metadata["{Exif}"] as? [String: Any],
+       let dateTimeOriginal = exif["DateTimeOriginal"] as? String {
+        return formatter.date(from: dateTimeOriginal)
+    }
+    
+    if let tiff = metadata["{TIFF}"] as? [String: Any],
+       let dateTime = tiff["DateTime"] as? String {
+        return formatter.date(from: dateTime)
+    }
+    
+    return nil
 }

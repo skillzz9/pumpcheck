@@ -218,6 +218,25 @@ struct Step2View: View {
     }
 }
 
+// Activity level, sex and goal for the calorie target
+struct ActivityStepView: View {
+    @Bindable var viewModel: OnboardingViewModel
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 24) {
+                Text("How active are you?")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundColor(Theme.textPrimary)
+
+                NutritionSettingsForm(viewModel: viewModel)
+            }
+            .padding(.horizontal, 4)
+            .padding(.bottom, 16)
+        }
+    }
+}
+
 // Step 3: Experience
 struct Step3View: View {
     @Bindable var viewModel: OnboardingViewModel
@@ -493,7 +512,7 @@ struct Step6View: View {
                                 .foregroundColor(Theme.paleSky)
                                 .padding(.vertical, 16)
                                 .padding(.horizontal, 24)
-                                .background(Theme.accent)
+                                .background(Theme.signUpButton)
                                 .cornerRadius(16)
                         }
                         .transition(.scale.combined(with: .opacity))

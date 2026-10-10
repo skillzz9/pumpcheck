@@ -14,7 +14,7 @@ if [ $BUILD_STATUS -ne 0 ]; then
 fi
 
 echo "✅ Build successful! Installing to simulator..."
-APP_PATH=$(find build/Build/Products -name "*.app" | head -n 1)
+APP_PATH="build/Build/Products/Debug-iphonesimulator/PumpCheck.app"
 
 if [ -n "$APP_PATH" ]; then
     # Forcefully kill the running app

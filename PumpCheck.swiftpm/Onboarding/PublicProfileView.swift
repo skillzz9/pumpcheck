@@ -32,6 +32,9 @@ struct PublicProfileView: View {
                     .scaleEffect(1.5)
             } else {
                 ScrollView {
+                VStack(spacing: 32) {
+                    
+                    // TOP HALF
                     VStack(spacing: 32) {
                         // Profile Header
                         VStack(spacing: 16) {
@@ -120,8 +123,16 @@ struct PublicProfileView: View {
                             .clipShape(Capsule())
                             .overlay(Capsule().stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
                         }
-                        .padding(.horizontal, 24)
-                        
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 40)
+                    .padding(.bottom, 24)
+                    .background(
+                        Theme.paleSky.padding(.top, -1000)
+                    )
+                    
+                    // BOTTOM HALF
+                    VStack(alignment: .leading, spacing: 32) {
                         // Lifts
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Proudest Lifts")
@@ -157,18 +168,17 @@ struct PublicProfileView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 24)
                         
                         // Progress Flicker Gallery
                         ProgressFlickerGallery(photos: progressPhotos)
-                            .padding(.horizontal, 24)
                         
                         Spacer(minLength: 40)
                     }
-                    .padding(.top, 40)
+                    .padding(.horizontal, 24)
                     .padding(.bottom, 120)
                 }
             }
+        }
         }
         .navigationTitle(username)
         .navigationBarTitleDisplayMode(.inline)
@@ -176,7 +186,7 @@ struct PublicProfileView: View {
             await fetchPublicProfile()
         }
         .navigationDestination(isPresented: $navToStats) {
-            StatsView(username: username, heightStr: height, weightStr: weight, lifts: proudestLifts, selection: initialStatSelection)
+            StatsView(userId: userId, username: username, heightStr: height, weightStr: weight, lifts: proudestLifts, selection: initialStatSelection)
         }
         
         

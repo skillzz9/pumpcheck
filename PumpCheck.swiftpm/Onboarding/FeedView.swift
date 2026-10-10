@@ -51,6 +51,7 @@ struct FeedView: View {
                     LazyVStack(spacing: 24) {
                         ForEach($posts) { $post in
                             FeedPostView(
+                                viewModel: viewModel,
                                 post: $post, 
                                 selectedPostId: $selectedPostId,
                                 onNavigateToProfile: { uid, uname in
@@ -79,6 +80,7 @@ struct FeedView: View {
                 }
             }
             .toolbar {
+                #if DEBUG
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         Task {
@@ -100,6 +102,7 @@ struct FeedView: View {
                             .cornerRadius(8)
                     }
                 }
+                #endif
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showCreatePost = true }) {
                         Image(systemName: "plus")
@@ -155,6 +158,10 @@ struct FeedView: View {
                 let data = doc.data()
                 let id = data["id"] as? String ?? doc.documentID
                 let userId = data["userId"] as? String ?? ""
+                
+                if viewModel.blockedUsers.contains(userId) {
+                    continue
+                }
                 let username = data["username"] as? String ?? "Unknown"
                 let pfp = data["profilePictureBase64"] as? String
                 let photoBase64 = data["photoBase64"] as? String ?? ""
@@ -211,12 +218,14 @@ struct FeedView: View {
 }
 
 struct FeedPostView: View {
+    @Bindable var viewModel: OnboardingViewModel
     @Binding var post: FeedPost
     @Binding var selectedPostId: String?
     var onNavigateToProfile: (String, String) -> Void
     
     @State private var profileImageData: Data? = nil
     @State private var sliderValue: Double = 0
+    @AppStorage(ProgressSliderMode.storageKey) private var sliderMode: ProgressSliderMode = .flicker
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -258,6 +267,39 @@ struct FeedPostView: View {
                 Text(post.date, style: .time)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
+                
+                Menu {
+                    Button(role: .destructive) {
+                        let db = Firestore.firestore()
+                        let uid = Auth.auth().currentUser?.uid ?? ""
+                        db.collection("reports").addDocument(data: [
+                            "postId": post.id,
+                            "reporterId": uid,
+                            "postUserId": post.userId,
+                            "reason": "Inappropriate Content",
+                            "date": FieldValue.serverTimestamp()
+                        ])
+                    } label: {
+                        Label("Report Post", systemImage: "exclamationmark.bubble")
+                    }
+                    
+                    Button(role: .destructive) {
+                        let db = Firestore.firestore()
+                        let uid = Auth.auth().currentUser?.uid ?? ""
+                        if !uid.isEmpty {
+                            db.collection("users").document(uid).updateData([
+                                "blockedUsers": FieldValue.arrayUnion([post.userId])
+                            ])
+                            viewModel.blockedUsers.append(post.userId)
+                        }
+                    } label: {
+                        Label("Block User", systemImage: "person.fill.xmark")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .foregroundColor(Theme.textSecondary)
+                        .padding(.leading, 8)
+                }
             }
             .padding(.horizontal, 16)
 
@@ -265,30 +307,15 @@ struct FeedPostView: View {
             // Image area
             if post.photos.count > 1 {
                 VStack(spacing: 0) {
-                    let currentIndex = Int(round(sliderValue))
-                    if currentIndex >= 0 && currentIndex < post.photos.count,
-                       let uiImage = ImageCache.decode(base64: post.photos[currentIndex]) {
-                        
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(1.0, contentMode: .fit)
-                            .clipped()
-                            
-                    } else {
-                        Rectangle()
-                            .fill(Theme.cardBackground)
-                            .aspectRatio(1.0, contentMode: .fit)
-                            .overlay(
-                                Text("Photo error").foregroundColor(Theme.taupeGrey)
-                            )
-                    }
-                    
-                    // The Flicker Slider
+                    ProgressPhotoStack(photos: post.photos, sliderValue: sliderValue, mode: sliderMode, fill: true)
+                        .overlay(alignment: .topTrailing) {
+                            ProgressSliderModeToggle(mode: $sliderMode)
+                        }
+
+                    // The Flicker / Fade Slider
                     VStack(spacing: 4) {
                         Slider(value: $sliderValue, in: 0...Double(post.photos.count - 1), onEditingChanged: { editing in
-                            if !editing {
+                            if !editing && sliderMode == .flicker {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     sliderValue = round(sliderValue)
                                 }
@@ -344,9 +371,17 @@ struct FeedPostView: View {
                         selectedPostId = post.id
                     }
                 } label: {
-                    Image(systemName: "message")
-                        .font(.system(size: 24))
-                        .foregroundColor(Theme.textPrimary)
+                    HStack(spacing: 6) {
+                        Image(systemName: "message")
+                            .font(.system(size: 24))
+                        
+                        let totalComments = post.comments.reduce(0) { $0 + 1 + $1.replies.count }
+                        if totalComments > 0 {
+                            Text("\(totalComments)")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        }
+                    }
+                    .foregroundColor(Theme.textPrimary)
                 }
                 
                 Spacer()
@@ -388,33 +423,44 @@ struct FeedPostView: View {
         let db = Firestore.firestore()
         let uid = Auth.auth().currentUser?.uid ?? ""
         let postId = post.id
+        let postUserId = post.userId
         
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
             if post.isKudoed {
                 post.kudos -= 1
                 post.isKudoed = false
+                
+                if postUserId == uid {
+                    viewModel.kudos -= 1
+                }
+                
                 if !uid.isEmpty {
-                    db.collection("posts").document(postId).setData([
+                    db.collection("posts").document(postId).updateData([
                         "kudos": FieldValue.increment(Int64(-1)),
                         "kudoedBy": FieldValue.arrayRemove([uid])
-                    ], merge: true)
+                    ])
                     
-                    db.collection("users").document(post.userId).setData([
+                    db.collection("users").document(postUserId).updateData([
                         "kudos": FieldValue.increment(Int64(-1))
-                    ], merge: true)
+                    ])
                 }
             } else {
                 post.kudos += 1
                 post.isKudoed = true
+                
+                if postUserId == uid {
+                    viewModel.kudos += 1
+                }
+                
                 if !uid.isEmpty {
-                    db.collection("posts").document(postId).setData([
+                    db.collection("posts").document(postId).updateData([
                         "kudos": FieldValue.increment(Int64(1)),
                         "kudoedBy": FieldValue.arrayUnion([uid])
-                    ], merge: true)
+                    ])
                     
-                    db.collection("users").document(post.userId).setData([
+                    db.collection("users").document(postUserId).updateData([
                         "kudos": FieldValue.increment(Int64(1))
-                    ], merge: true)
+                    ])
                 }
             }
         }

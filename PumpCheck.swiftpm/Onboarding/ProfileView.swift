@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 import Charts
 
 struct ProfileView: View {
@@ -7,72 +8,96 @@ struct ProfileView: View {
     
     @State private var navToStats: Bool = false
     @State private var initialStatSelection: StatSelection = .height
-    
+    @State private var showDeleteConfirm = false
+    @State private var deletePassword = ""
+    @State private var isDeletingAccount = false
+    @State private var deleteError: String? = nil
+
     var body: some View {
         NavigationStack {
             ZStack {
             Theme.bgGradient.ignoresSafeArea()
             
             ScrollView {
+                HStack {
+                    Spacer()
+                    Menu {
+                        Button(role: .destructive, action: {
+                            deletePassword = ""
+                            showDeleteConfirm = true
+                        }) {
+                            Label("Delete Account", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(Theme.textSecondary)
+                            .padding()
+                    }
+                }
                 VStack(spacing: 32) {
-                    // Profile Header
-                    VStack(spacing: 16) {
-                        ZStack {
-                            Circle()
-                                .fill(Theme.cardBackground)
-                                .frame(width: 140, height: 140)
-                                .shadow(color: Theme.accent.opacity(0.2), radius: 20, x: 0, y: 10)
-                            
-                            if let data = viewModel.profileImageData, let uiImage = UIImage(data: data) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 140, height: 140)
-                                    .clipShape(Circle())
-                            } else {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                                    .frame(width: 140, height: 140)
-                                    .foregroundColor(Theme.accent)
-                            }
-                            
-                            if viewModel.isNatty {
-                                HStack(spacing: 2) {
-                                    Text("Natty")
-                                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                                    Image(systemName: "checkmark.seal.fill")
-                                        .font(.system(size: 10))
+                    // TOP HALF
+                    VStack(spacing: 12) {
+                        // Profile Header
+                        VStack(spacing: 6) {
+                            ZStack {
+                                Circle()
+                                    .fill(Theme.cardBackground)
+                                    .frame(width: 216, height: 216)
+                                    .shadow(color: Theme.accent.opacity(0.2), radius: 20, x: 0, y: 10)
+                                
+                                if let data = viewModel.profileImageData, let uiImage = UIImage(data: data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 216, height: 216)
+                                        .clipShape(Circle())
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .frame(width: 216, height: 216)
+                                        .foregroundColor(Theme.accent)
                                 }
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Theme.accent)
-                                .clipShape(Capsule())
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Theme.paleSky, lineWidth: 2)
-                                )
-                                .shadow(color: Theme.accent.opacity(0.3), radius: 3, x: 0, y: 2)
-                                .offset(x: 45, y: -55)
+                                
+                                if viewModel.isNatty {
+                                    HStack(spacing: 2) {
+                                        Text("Natty")
+                                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                                        Image(systemName: "checkmark.seal.fill")
+                                            .font(.system(size: 10))
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Theme.accent)
+                                    .clipShape(Capsule())
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Theme.paleSky, lineWidth: 2)
+                                    )
+                                    .shadow(color: Theme.accent.opacity(0.3), radius: 3, x: 0, y: 2)
+                                    .offset(x: 78, y: -96)
+                                }
+                            }
+                            
+                            VStack(spacing: 2) {
+                                Text("@\(viewModel.username.isEmpty ? "username" : viewModel.username)")
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .foregroundColor(Theme.pitchBlack)
+                                
+                                let y = viewModel.yearsLifted
+                                let m = viewModel.monthsLifted
+                                let expStr = (!y.isEmpty && y != "0" ? "\(y)y " : "") + (!m.isEmpty && m != "0" ? "\(m)m " : "")
+                                let finalExp = expStr.isEmpty ? "Just started" : expStr + "lifting"
+                                let ageStr = viewModel.age.isEmpty ? "" : "\(viewModel.age)yo • "
+                                
+                                Text(ageStr + finalExp)
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .foregroundColor(Theme.pitchBlack)
                             }
                         }
                         
-                        VStack(spacing: 4) {
-                            Text("@\(viewModel.username.isEmpty ? "username" : viewModel.username)")
-                                .font(.system(size: 24, weight: .bold, design: .rounded))
-                                .foregroundColor(Theme.pitchBlack)
-                            
-                            let y = viewModel.yearsLifted
-                            let m = viewModel.monthsLifted
-                            let expStr = (!y.isEmpty && y != "0" ? "\(y)y " : "") + (!m.isEmpty && m != "0" ? "\(m)m " : "")
-                            let finalExp = expStr.isEmpty ? "Just started" : expStr + "lifting"
-                            let ageStr = viewModel.age.isEmpty ? "" : "\(viewModel.age)yo • "
-                            
-                            Text(ageStr + finalExp)
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
-                                .foregroundColor(Theme.pitchBlack)
-                        }
-                        
+                        // Stats row
                         HStack(spacing: 12) {
                             // Height Pill
                             Button { initialStatSelection = .height; navToStats = true } label: {
@@ -121,42 +146,79 @@ struct ProfileView: View {
                             .overlay(Capsule().stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
                         }
                     }
-                    .padding(.top, 40)
-                    .padding(.bottom, 24)
                     .padding(.horizontal, 24)
+                    .padding(.top, 12)
+                    .padding(.bottom, 12)
                     .background(
-                        Theme.paleSky
-                        .padding(.top, -1000)
-                        .padding(.horizontal, -24)
+                        Theme.paleSky.padding(.top, -1000)
                     )
-                    // Removed corner radius and offset padding so it acts as a sharp full-width block
                     
-                    // Lifts
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Proudest Lifts")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.textPrimary)
+                    // BOTTOM HALF
+                    VStack(spacing: 32) {
+                        // Lifts
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Proudest Lifts")
+                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+                            
+                            if viewModel.proudestLifts.isEmpty {
+                                Text("No lifts recorded yet.")
+                                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                                    .foregroundColor(Theme.textSecondary)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Theme.cardBackground)
+                                    .cornerRadius(16)
+                            } else {
+                                VStack(spacing: 12) {
+                                    ForEach(viewModel.proudestLifts) { lift in
+                                        Button { initialStatSelection = .lift(lift.name); navToStats = true } label: {
+                                            HStack {
+                                                Text(lift.name)
+                                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                                    .foregroundColor(Theme.textPrimary)
+                                                Spacer()
+                                                Text("\(lift.weight, specifier: "%.1f") × \(lift.reps)")
+                                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                                    .foregroundColor(Theme.accent)
+                                            }
+                                            .padding()
+                                            .background(Theme.cardBackground)
+                                            .cornerRadius(16)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         
-                        if viewModel.proudestLifts.isEmpty {
-                            Text("No lifts recorded yet.")
-                                .font(.system(size: 16, weight: .regular, design: .rounded))
-                                .foregroundColor(Theme.textSecondary)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Theme.cardBackground)
-                                .cornerRadius(16)
-                        } else {
-                            VStack(spacing: 12) {
-                                ForEach(viewModel.proudestLifts) { lift in
-                                    Button { initialStatSelection = .lift(lift.name); navToStats = true } label: {
-                                        HStack {
-                                            Text(lift.name)
-                                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        // Progress Flicker Gallery
+                        let photoArray = viewModel.progressEntries.sorted(by: { $0.date < $1.date }).map { $0.photoBase64 }.filter { !$0.isEmpty }
+                        ProgressFlickerGallery(photos: photoArray)
+                        
+                        // Goals
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Goals")
+                                .font(.system(size: 20, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+                            
+                            if viewModel.goals.isEmpty {
+                                Text("No goals set yet.")
+                                    .font(.system(size: 16, weight: .regular, design: .rounded))
+                                    .foregroundColor(Theme.textSecondary)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Theme.cardBackground)
+                                    .cornerRadius(16)
+                            } else {
+                                VStack(spacing: 12) {
+                                    ForEach(viewModel.goals, id: \.self) { goal in
+                                        HStack(spacing: 16) {
+                                            Image(systemName: "target")
+                                                .foregroundColor(Theme.accent)
+                                            Text(goal)
+                                                .font(.system(size: 16, weight: .medium, design: .rounded))
                                                 .foregroundColor(Theme.textPrimary)
                                             Spacer()
-                                            Text("\(lift.weight, specifier: "%.1f") × \(lift.reps)")
-                                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                                                .foregroundColor(Theme.accent)
                                         }
                                         .padding()
                                         .background(Theme.cardBackground)
@@ -165,69 +227,98 @@ struct ProfileView: View {
                                 }
                             }
                         }
-                    }
-                    
-                    // Progress Flicker Gallery
-                    let photoArray = viewModel.progressEntries.sorted(by: { $0.date < $1.date }).map { $0.photoBase64 }.filter { !$0.isEmpty }
-                    ProgressFlickerGallery(photos: photoArray)
-                    
-                    // Goals
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Goals")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.textPrimary)
                         
-                        if viewModel.goals.isEmpty {
-                            Text("No goals set yet.")
-                                .font(.system(size: 16, weight: .regular, design: .rounded))
-                                .foregroundColor(Theme.textSecondary)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                        #if DEBUG
+                        Button(action: {
+                            Task {
+                                guard let uid = Auth.auth().currentUser?.uid else { return }
+                                let db = Firestore.firestore()
+                                if let snapshot = try? await db.collection("users").document(uid).collection("progress").getDocuments() {
+                                    for doc in snapshot.documents {
+                                        try? await doc.reference.delete()
+                                    }
+                                }
+                                await MainActor.run { viewModel.progressEntries = [] }
+                            }
+                        }) {
+                            Text("Wipe All Progress (Dev)")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(.red)
+                                .padding(.vertical, 16)
+                                .frame(maxWidth: .infinity)
                                 .background(Theme.cardBackground)
                                 .cornerRadius(16)
-                        } else {
-                            VStack(spacing: 12) {
-                                ForEach(viewModel.goals, id: \.self) { goal in
-                                    HStack(spacing: 16) {
-                                        Image(systemName: "target")
-                                            .foregroundColor(Theme.accent)
-                                        Text(goal)
-                                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                                            .foregroundColor(Theme.textPrimary)
-                                        Spacer()
-                                    }
-                                    .padding()
-                                    .background(Theme.cardBackground)
-                                    .cornerRadius(16)
-                                }
-                            }
+                        }
+                        #endif
+
+                        Button(action: {
+                            do {
+                                try FirebaseAuth.Auth.auth().signOut()
+                            } catch {}
+                        }) {
+                            Text("Log Out")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(.red)
+                                .padding(.vertical, 16)
+                                .frame(maxWidth: .infinity)
+                                .background(Theme.cardBackground)
+                                .cornerRadius(16)
+                        }
+                        .padding(.top, 20)
+                        
+                        Spacer(minLength: 40)
+                    }
+                    .padding(.horizontal, 24)
+                }
+            }
+        .overlay {
+                if isDeletingAccount {
+                    ZStack {
+                        Color.black.opacity(0.6).ignoresSafeArea()
+                        VStack(spacing: 12) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: Theme.accent))
+                                .scaleEffect(1.5)
+                            Text("Deleting account…")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
                         }
                     }
-                    
-                    Button(action: {
-                        do {
-                            try FirebaseAuth.Auth.auth().signOut()
-                            // We need a way to reset the app state.
-                            // The easiest way is to use a notification or binding, 
-                            // but for this MVP we can just crash to restart or ideally set isCompleted = false
-                        } catch {}
-                    }) {
-                        Text("Log Out")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundColor(.red)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity)
-                            .background(Theme.cardBackground)
-                            .cornerRadius(16)
-                    }
-                    .padding(.top, 20)
-                    
-                    Spacer(minLength: 40)
                 }
-                .padding(.horizontal, 24)
             }
-            .navigationDestination(isPresented: $navToStats) {
-                StatsView(username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
+        .alert("Delete Account?", isPresented: $showDeleteConfirm) {
+                SecureField("Password", text: $deletePassword)
+                Button("Cancel", role: .cancel) { deletePassword = "" }
+                Button("Delete", role: .destructive) {
+                    let password = deletePassword
+                    deletePassword = ""
+                    isDeletingAccount = true
+                    Task {
+                        do {
+                            // On success Auth signs out and OnboardingWrapperView returns to onboarding
+                            try await viewModel.deleteAccount(password: password)
+                        } catch let error as NSError where error.domain == "PumpCheck" {
+                            deleteError = error.localizedDescription
+                        } catch {
+                            deleteError = "Something went wrong while deleting your account. Check your connection and try again."
+                        }
+                        isDeletingAccount = false
+                    }
+                }
+                .disabled(deletePassword.isEmpty)
+            } message: {
+                Text("This permanently deletes your account, posts, comments, kudos and progress photos. This can't be undone. Enter your password to confirm.")
+            }
+        .alert("Couldn't Delete Account", isPresented: Binding(
+                get: { deleteError != nil },
+                set: { if !$0 { deleteError = nil } }
+            )) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(deleteError ?? "")
+            }
+        .navigationDestination(isPresented: $navToStats) {
+                StatsView(userId: Auth.auth().currentUser?.uid ?? "", username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
             }
         }
     }
@@ -237,6 +328,7 @@ struct ProfileView: View {
 struct ProgressFlickerGallery: View {
     let photos: [String] // Array of base64 strings
     @State private var sliderValue: Double = 0
+    @AppStorage(ProgressSliderMode.storageKey) private var sliderMode: ProgressSliderMode = .flicker
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -254,27 +346,20 @@ struct ProgressFlickerGallery: View {
                     .cornerRadius(16)
             } else {
                 VStack(spacing: 0) {
-                    let currentIndex = Int(sliderValue)
-                    if currentIndex >= 0 && currentIndex < photos.count,
-                       let data = Data(base64Encoded: photos[currentIndex]),
-                       let uiImage = UIImage(data: data) {
-                        
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(1.0, contentMode: .fit)
-                            .clipped()
-                            
-                    } else {
-                        Rectangle()
-                            .fill(Theme.cardBackground)
-                            .aspectRatio(1.0, contentMode: .fit)
-                    }
-                    
+                    ProgressPhotoStack(photos: photos, sliderValue: sliderValue, mode: sliderMode)
+                        .overlay(alignment: .topTrailing) {
+                            if photos.count > 1 {
+                                ProgressSliderModeToggle(mode: $sliderMode)
+                            }
+                        }
+
                     if photos.count > 1 {
                         VStack(spacing: 4) {
-                            Slider(value: $sliderValue, in: 0...Double(photos.count - 1), step: 1.0)
+                            Slider(value: $sliderValue, in: 0...Double(photos.count - 1), onEditingChanged: { editing in
+                                if !editing && sliderMode == .flicker {
+                                    sliderValue = round(sliderValue)
+                                }
+                            })
                                 .tint(Theme.accent)
                             
                             HStack {
@@ -298,7 +383,6 @@ struct ProgressFlickerGallery: View {
                 }
                 .background(Theme.pitchBlack.opacity(0.2))
                 .cornerRadius(16)
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.taupeGrey.opacity(0.2), lineWidth: 1))
             }
         }
     }

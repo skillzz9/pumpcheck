@@ -1,6 +1,7 @@
-with open("PumpCheckExpo/src/screens/ProfileView.tsx", "r") as f:
-    content = f.read()
+with open("PumpCheck.swiftpm/Onboarding/ProfileView.swift", "r") as f:
+    text = f.read()
 
-content = content.replace("((goal: any, index: number)) =>", "(goal: any, index: number) =>")
-with open("PumpCheckExpo/src/screens/ProfileView.tsx", "w") as f:
-    f.write(content)
+text = text.replace("}\n\nstruct ProgressFlickerGallery: View {", "}\n}\n\nstruct ProgressFlickerGallery: View {")
+
+with open("PumpCheck.swiftpm/Onboarding/ProfileView.swift", "w") as f:
+    f.write(text)

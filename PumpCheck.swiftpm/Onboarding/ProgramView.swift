@@ -7,6 +7,10 @@ struct ProgramView: View {
     @State private var isSignedUp = false
     @State private var isUpdating = false
     @State private var isCheckingStatus = true
+    @State private var showScoringTest = false
+    @State private var showComparisonTest = false
+    @State private var showMealModelTest = false
+    @State private var showGuidedScan = false
     
     var body: some View {
         NavigationStack {
@@ -128,10 +132,74 @@ struct ProgramView: View {
                         .padding(.horizontal, 24)
                         .padding(.top, 20)
                         
+                        Button(action: { showScoringTest = true }) {
+                            Text("Test AI Score")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Theme.cardBackground)
+                                .cornerRadius(16)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.accent, lineWidth: 1))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
+                        
+                        Button(action: { showComparisonTest = true }) {
+                            Text("Test Comparison Score")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Theme.cardBackground)
+                                .cornerRadius(16)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.accent, lineWidth: 1))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
+
+                        Button(action: { showMealModelTest = true }) {
+                            Text("Test Meal Models (Opus vs Sonnet)")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Theme.cardBackground)
+                                .cornerRadius(16)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.accent, lineWidth: 1))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
+
+                        Button(action: { showGuidedScan = true }) {
+                            Text("Guided Scan (Camera)")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(Theme.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Theme.cardBackground)
+                                .cornerRadius(16)
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.accent, lineWidth: 1))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
+                        
                         Spacer(minLength: 40)
                     }
                     .padding(.bottom, 120)
                 }
+            }
+            .sheet(isPresented: $showScoringTest) {
+                TestScoringView(viewModel: viewModel)
+            }
+            .sheet(isPresented: $showComparisonTest) {
+                TestComparisonView(viewModel: viewModel)
+            }
+            .sheet(isPresented: $showMealModelTest) {
+                TestMealModelsView()
+            }
+            .fullScreenCover(isPresented: $showGuidedScan) {
+                GuidedScanView(viewModel: viewModel)
             }
             .navigationTitle("Program")
             .navigationBarTitleDisplayMode(.inline)

@@ -24,6 +24,10 @@ struct MainTabView: View {
                     .opacity(selectedTab == 2 ? 1 : 0)
                     .allowsHitTesting(selectedTab == 2)
                     
+                DietView(viewModel: viewModel)
+                    .opacity(selectedTab == 4 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 4)
+                    
                 ProfileView(viewModel: viewModel)
                     .opacity(selectedTab == 3 ? 1 : 0)
                     .allowsHitTesting(selectedTab == 3)
@@ -44,6 +48,9 @@ struct MainTabView: View {
                     }
                     TabBarItem(icon: "chart.xyaxis.line", title: "Progress", isSelected: selectedTab == 2) {
                         switchToTab(2)
+                    }
+                    TabBarItem(icon: "fork.knife", title: "Diet", isSelected: selectedTab == 4) {
+                        switchToTab(4)
                     }
                     TabBarItem(icon: "person.crop.circle", title: "Profile", isSelected: selectedTab == 3) {
                         switchToTab(3)
@@ -90,6 +97,7 @@ struct TabBarItem: View {
             VStack(spacing: 4) {
                 Image(systemName: icon)
                     .font(.system(size: 24, weight: isSelected ? .bold : .regular))
+                    .frame(height: 28) // Same box for every symbol so all titles share one baseline
                     .scaleEffect(isBouncing ? 0.7 : 1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0), value: isBouncing)
                 

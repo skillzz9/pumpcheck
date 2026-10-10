@@ -7,8 +7,9 @@ struct OnboardingWrapperView: View {
     @State private var isCompleted: Bool = false
     @State private var isCheckingAuth: Bool = true
     @State private var showLogin: Bool = false
+    @State private var authHandle: AuthStateDidChangeListenerHandle? = nil
     
-    let totalSteps = 7
+    let totalSteps = 8
     
     var body: some View {
         Group {
@@ -39,11 +40,12 @@ struct OnboardingWrapperView: View {
                     TabView(selection: $currentStep) {
                         Step1View(viewModel: viewModel, onLoginTap: { showLogin = true }).tag(1)
                         Step2View(viewModel: viewModel).tag(2)
-                        Step3View(viewModel: viewModel).tag(3)
-                        Step4View(viewModel: viewModel).tag(4)
-                        Step5View(viewModel: viewModel).tag(5)
-                        Step6View(viewModel: viewModel).tag(6)
-                        Step7View(viewModel: viewModel).tag(7)
+                        ActivityStepView(viewModel: viewModel).tag(3)
+                        Step3View(viewModel: viewModel).tag(4)
+                        Step4View(viewModel: viewModel).tag(5)
+                        Step5View(viewModel: viewModel).tag(6)
+                        Step6View(viewModel: viewModel).tag(7)
+                        Step7View(viewModel: viewModel).tag(8)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .animation(.easeInOut, value: currentStep)
@@ -85,11 +87,11 @@ struct OnboardingWrapperView: View {
                         }) {
                             if viewModel.isCreatingAccount {
                                 ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: Theme.pitchBlack))
-                                    .pumpButtonStyle(isPrimary: true)
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Theme.paleSky))
+                                    .signUpButtonStyle()
                             } else {
                                 Text(currentStep == totalSteps ? "Create Account" : "Next")
-                                    .pumpButtonStyle(isPrimary: true)
+                                    .signUpButtonStyle()
                             }
                         }
                         .disabled(viewModel.isCreatingAccount || (currentStep == totalSteps && (viewModel.email.isEmpty || viewModel.password.isEmpty || viewModel.password != viewModel.confirmPassword)))
@@ -107,9 +109,22 @@ struct OnboardingWrapperView: View {
                 LoginView(viewModel: viewModel, isPresented: $showLogin, isCompleted: $isCompleted)
             }
         }
+        }
+        .onAppear {
+            // Return to onboarding whenever the user signs out or deletes their account
+            guard authHandle == nil else { return }
+            authHandle = Auth.auth().addStateDidChangeListener { _, user in
+                if user == nil && isCompleted {
+                    viewModel = OnboardingViewModel()
+                    currentStep = 1
+                    withAnimation {
+                        isCompleted = false
+                    }
+                }
+            }
+        }
     }
-    
-    }
+
     func checkAuthStatus() {
         if let user = Auth.auth().currentUser {
             Task {

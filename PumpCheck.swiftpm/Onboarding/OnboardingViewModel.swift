@@ -26,6 +26,11 @@ class OnboardingViewModel {
     var monthsLifted: String = ""
     var isNatty: Bool = true
     
+    // Calorie goal inputs (raw values of BiologicalSex, ActivityLevel, DietGoal)
+    var sex: String = ""
+    var activityLevel: String = ""
+    var dietGoal: String = ""
+    
     // Progress
     var progressEntries: [ProgressEntry] = []
     
@@ -80,6 +85,7 @@ class OnboardingViewModel {
     var currentGoal: String = ""
     var goals: [String] = []
     var kudos: Int = 0
+    var blockedUsers: [String] = []
     
     // Step 6 (Now used as Step 1)
     var username: String = ""
@@ -172,6 +178,9 @@ class OnboardingViewModel {
                 "yearsLifted": yearsLifted,
                 "monthsLifted": monthsLifted,
                 "isNatty": isNatty,
+                "sex": sex,
+                "activityLevel": activityLevel,
+                "dietGoal": dietGoal,
                 "goals": goals,
                 "kudos": 0,
                 "lifts": liftsDict,
@@ -230,6 +239,127 @@ class OnboardingViewModel {
         ]
         
         db.collection("users").document(uid).collection("progress").document(entry.id).setData(data)
+    }
+
+    func deleteProgressEntry(_ entry: ProgressEntry) async throws {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+
+        try await db.collection("users").document(uid).collection("progress").document(entry.id).delete()
+
+        await MainActor.run {
+            progressEntries.removeAll { $0.id == entry.id }
+        }
+    }
+
+    /// Permanently deletes the signed-in user's account and everything they created:
+    /// posts, kudos given, comments/replies on other posts, progress entries, and the user document.
+    /// Re-authenticates first so Firebase doesn't refuse the final Auth deletion with "requires recent login".
+    func deleteAccount(password: String) async throws {
+        guard let user = Auth.auth().currentUser, let email = user.email else {
+            throw NSError(domain: "PumpCheck", code: 401, userInfo: [NSLocalizedDescriptionKey: "You're not signed in. Please log in again and retry."])
+        }
+        let uid = user.uid
+        let db = Firestore.firestore()
+        let posts = db.collection("posts")
+
+        do {
+            try await user.reauthenticate(with: EmailAuthProvider.credential(withEmail: email, password: password))
+        } catch {
+            throw NSError(domain: "PumpCheck", code: 403, userInfo: [NSLocalizedDescriptionKey: "Incorrect password. Please try again."])
+        }
+
+        // 1. Their own posts
+        let ownPosts = try await posts.whereField("userId", isEqualTo: uid).getDocuments()
+        for doc in ownPosts.documents {
+            try await doc.reference.delete()
+        }
+
+        // 2. Kudos they gave on other people's posts
+        let kudoedPosts = try await posts.whereField("kudoedBy", arrayContains: uid).getDocuments()
+        for doc in kudoedPosts.documents {
+            try await doc.reference.updateData([
+                "kudos": FieldValue.increment(Int64(-1)),
+                "kudoedBy": FieldValue.arrayRemove([uid])
+            ])
+            // Author's profile kudos counter is cosmetic; the author may already be deleted, so don't fail on it
+            if let authorId = doc.data()["userId"] as? String {
+                try? await db.collection("users").document(authorId).updateData(["kudos": FieldValue.increment(Int64(-1))])
+            }
+        }
+
+        // 3. Comments and replies on other people's posts (stored inline in each post's "comments" array)
+        let allPosts = try await posts.getDocuments()
+        for doc in allPosts.documents {
+            guard let comments = doc.data()["comments"] as? [[String: Any]] else { continue }
+            var changed = false
+            var kept: [[String: Any]] = []
+            for var comment in comments {
+                if comment["userId"] as? String == uid {
+                    changed = true
+                    continue
+                }
+                if let replies = comment["replies"] as? [[String: Any]] {
+                    let filtered = replies.filter { $0["userId"] as? String != uid }
+                    if filtered.count != replies.count {
+                        comment["replies"] = filtered
+                        changed = true
+                    }
+                }
+                kept.append(comment)
+            }
+            if changed {
+                try await doc.reference.updateData(["comments": kept])
+            }
+        }
+
+        // 4. Progress photos
+        let progress = try await db.collection("users").document(uid).collection("progress").getDocuments()
+        for doc in progress.documents {
+            try await doc.reference.delete()
+        }
+
+        // 5. Logged meals
+        let meals = try await db.collection("users").document(uid).collection("meals").getDocuments()
+        for doc in meals.documents {
+            try await doc.reference.delete()
+        }
+
+        // 6. Daily calorie summaries
+        let dailyCalories = try await db.collection("users").document(uid).collection("dailyCalories").getDocuments()
+        for doc in dailyCalories.documents {
+            try await doc.reference.delete()
+        }
+
+        // 7. Quick adds
+        let quickAdds = try await db.collection("users").document(uid).collection("quickAdds").getDocuments()
+        for doc in quickAdds.documents {
+            try await doc.reference.delete()
+        }
+
+        // 8. User document, then the Auth account itself
+        try await db.collection("users").document(uid).delete()
+        try await user.delete()
+    }
+
+    /// Reads a profile stat saved either as text ("21") or as a number (21).
+    static func text(_ value: Any?) -> String {
+        if let string = value as? String { return string }
+        if let number = value as? NSNumber {
+            let double = number.doubleValue
+            return double.rounded() == double ? String(Int(double)) : String(double)
+        }
+        return ""
+    }
+
+    func saveNutritionSettings() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        Firestore.firestore().collection("users").document(uid).updateData([
+            "age": age,
+            "sex": sex,
+            "activityLevel": activityLevel,
+            "dietGoal": dietGoal
+        ])
     }
 
     func syncProfileStatsToFirebase() {
@@ -317,16 +447,20 @@ class OnboardingViewModel {
             // Auto-population now ONLY happens in createAccount() on first sign-up.
             
             self.progressEntries = currentEntries.sorted(by: { $0.date < $1.date })
-            self.age = data["age"] as? String ?? ""
-            self.height = data["height"] as? String ?? ""
+            self.age = Self.text(data["age"])
+            self.height = Self.text(data["height"])
             self.isHeightCm = data["isHeightCm"] as? Bool ?? true
-            self.weight = data["weight"] as? String ?? ""
+            self.weight = Self.text(data["weight"])
             self.isWeightKg = data["isWeightKg"] as? Bool ?? true
             self.yearsLifted = data["yearsLifted"] as? String ?? ""
             self.monthsLifted = data["monthsLifted"] as? String ?? ""
             self.isNatty = data["isNatty"] as? Bool ?? true
+            self.sex = data["sex"] as? String ?? ""
+            self.activityLevel = data["activityLevel"] as? String ?? ""
+            self.dietGoal = data["dietGoal"] as? String ?? ""
             self.goals = data["goals"] as? [String] ?? []
             self.kudos = data["kudos"] as? Int ?? 0
+            self.blockedUsers = data["blockedUsers"] as? [String] ?? []
             
             if let lifts = data["lifts"] as? [[String: Any]] {
                 self.proudestLifts = lifts.compactMap { liftDict in
