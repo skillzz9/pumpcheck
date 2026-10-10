@@ -60,3 +60,19 @@ extension View {
             .shadow(color: isPrimary && glow ? primaryColor.opacity(0.2) : .clear, radius: 8, x: 0, y: 4)
     }
 }
+
+extension Int {
+    /// Short count for kudos and likes: 950, 1.2k, 15k, 2.3M.
+    var compactCount: String {
+        func short(_ value: Double, _ suffix: String) -> String {
+            let rounded = (value * 10).rounded(.down) / 10
+            let text = rounded >= 10 || rounded == rounded.rounded() ? String(Int(rounded)) : String(format: "%.1f", rounded)
+            return text + suffix
+        }
+        switch abs(self) {
+        case 1_000_000...: return short(Double(self) / 1_000_000, "M")
+        case 1_000...: return short(Double(self) / 1_000, "k")
+        default: return String(self)
+        }
+    }
+}

@@ -17,7 +17,11 @@ struct LogProgressModal: View {
     @State private var offset: CGSize = .zero
     @State private var lastScale: CGFloat = 1.0
     @State private var lastOffset: CGSize = .zero
+    @State private var rotation: Angle = .zero
+    @State private var lastRotation: Angle = .zero
     @State private var cropSize: CGSize = .zero
+    @State private var isSaving = false
+    @State private var saveError: String? = nil
 
     var weightPercentChange: Double? {
         let cleanOld = viewModel.weight.replacingOccurrences(of: ",", with: ".").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -29,7 +33,7 @@ struct LogProgressModal: View {
     }
 
     var previousImage: UIImage? {
-        let sortedEntries = viewModel.progressEntries.sorted(by: { $0.date < $1.date })
+        let sortedEntries = viewModel.progressEntries.filter { !$0.photoBase64.isEmpty }.sorted(by: { $0.date < $1.date })
         if let lastEntry = sortedEntries.last {
             return ImageCache.decode(base64: lastEntry.photoBase64)
         }
@@ -57,6 +61,7 @@ struct LogProgressModal: View {
                                         y: offset.height * (cropSize.height > 0 ? (150.0 * (16.0 / 9.0)) / cropSize.height : 1.0)
                                     )
                                     .scaleEffect(scale)
+                                    .rotationEffect(rotation)
                             }
                             .frame(width: 150, height: 150 * (16.0 / 9.0))
                             .clipped()
@@ -186,9 +191,13 @@ struct LogProgressModal: View {
                         .foregroundColor(Theme.textPrimary)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") { saveProgress() }
-                        .fontWeight(.bold)
-                        .foregroundColor(Theme.accent)
+                    if isSaving {
+                        ProgressView().tint(Theme.accent)
+                    } else {
+                        Button("Save") { saveProgress() }
+                            .fontWeight(.bold)
+                            .foregroundColor(Theme.accent)
+                    }
                 }
             }
             .onAppear {
@@ -200,6 +209,11 @@ struct LogProgressModal: View {
                     newLifts.append(LiftRecord(name: "", weight: 0, reps: 0))
                 }
             }
+            .alert("Couldn't save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(saveError ?? "")
+            }
             .sheet(isPresented: $showCropModal) {
                 ImageCropperModal(
                     uiImage: uiImage,
@@ -208,6 +222,8 @@ struct LogProgressModal: View {
                     offset: $offset,
                     lastScale: $lastScale,
                     lastOffset: $lastOffset,
+                    rotation: $rotation,
+                    lastRotation: $lastRotation,
                     cropSize: $cropSize
                 ) {
                     showCropModal = false
@@ -232,6 +248,7 @@ struct LogProgressModal: View {
                 .scaledToFill()
                 .offset(x: offset.width * multX, y: offset.height * multY)
                 .scaleEffect(scale)
+                .rotationEffect(rotation)
         }
         .frame(width: renderWidth, height: renderHeight)
         .clipped()
@@ -240,7 +257,10 @@ struct LogProgressModal: View {
         renderer.scale = 1.0
         
         guard let finalImage = renderer.uiImage,
-              let data = finalImage.jpegData(compressionQuality: 0.5) else { return }
+              let data = finalImage.jpegData(compressionQuality: 0.5) else {
+            saveError = "Couldn't process the photo. Open Crop, check the alignment and try again."
+            return
+        }
               
         let base64 = data.base64EncodedString()
         
@@ -249,10 +269,25 @@ struct LogProgressModal: View {
             date: customDate,
             photoBase64: base64,
             weight: weight,
-            lifts: newLifts
+            lifts: newLifts,
+            coverage: ProgressCoverage.coverage(imageSize: uiImage.size, frameSize: cropSize, scale: scale, offset: offset, rotation: rotation)
         )
-        viewModel.saveProgressEntry(entry)
-        
+        isSaving = true
+        Task {
+            do {
+                try await viewModel.saveProgressEntry(entry)
+            } catch {
+                isSaving = false
+                saveError = error.localizedDescription
+                return
+            }
+            viewModel.setProfilePhotoIfMissing(from: finalImage)
+            finishSave()
+        }
+    }
+    
+    /// Updates profile stats from the saved entry, then closes the sheet.
+    private func finishSave() {
         // Update main profile stats
         var didUpdateStats = false
         if !weight.isEmpty && viewModel.weight != weight {
@@ -403,10 +438,19 @@ struct ImageCropperModal: View {
     @Binding var offset: CGSize
     @Binding var lastScale: CGFloat
     @Binding var lastOffset: CGSize
+    @Binding var rotation: Angle
+    @Binding var lastRotation: Angle
     @Binding var cropSize: CGSize
     var onDone: () -> Void
     
     @State private var isBlending = false
+    @State private var showEyes = true
+    
+    /// Magnification of the eyes view, so the eye markers are far enough apart to match by finger.
+    private static let eyeZoom: CGFloat = 4
+    /// Below 1 the photo is smaller than the frame, so close-up photos can still be aligned.
+    private static let minScale: CGFloat = 0.3
+    private static let maxScale: CGFloat = 8
     
     var body: some View {
         NavigationStack {
@@ -414,45 +458,71 @@ struct ImageCropperModal: View {
                 Theme.pitchBlack.ignoresSafeArea()
                 
                 VStack {
+                    Picker("View", selection: $showEyes.animation(.easeInOut(duration: 0.3))) {
+                        Text("Eyes").tag(true)
+                        Text("Full Body").tag(false)
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    
                     Spacer()
                     
                     Color.clear
                         .aspectRatio(9.0 / 16.0, contentMode: .fit)
                         .overlay(
                             GeometryReader { geo in
+                                let zoom = showEyes ? Self.eyeZoom : 1
                                 ZStack {
-                                    Theme.pitchBlack
-                                    
-                                    if isBlending, let prev = previousImage {
-                                        Image(uiImage: prev)
+                                    // Photo layers, magnified around the eye line in the eyes view.
+                                    // Gestures sit inside the transforms, so drags still track the finger at any zoom.
+                                    ZStack {
+                                        Theme.pitchBlack
+                                        
+                                        if isBlending, let prev = previousImage {
+                                            Image(uiImage: prev)
+                                                .resizable()
+                                                .scaledToFill()
+                                        }
+                                        
+                                        Image(uiImage: uiImage)
                                             .resizable()
                                             .scaledToFill()
-                                    }
-                                    
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .offset(offset)
-                                        .scaleEffect(scale)
-                                        .opacity(isBlending ? 0.5 : 1.0)
-                                        .gesture(
-                                            SimultaneousGesture(
-                                                MagnificationGesture()
-                                                    .onChanged { val in scale = max(1.0, lastScale * val) }
-                                                    .onEnded { val in lastScale = scale },
-                                                DragGesture()
-                                                    .onChanged { val in 
-                                                        offset = CGSize(
-                                                            width: lastOffset.width + val.translation.width,
-                                                            height: lastOffset.height + val.translation.height
-                                                        )
-                                                    }
-                                                    .onEnded { val in lastOffset = offset }
+                                            .offset(offset)
+                                            .scaleEffect(scale)
+                                            .rotationEffect(rotation)
+                                            .opacity(isBlending ? 0.5 : 1.0)
+                                            .gesture(
+                                                SimultaneousGesture(
+                                                    SimultaneousGesture(
+                                                        MagnificationGesture()
+                                                            .onChanged { val in setScale(lastScale * val) }
+                                                            .onEnded { _ in lastScale = scale },
+                                                        RotationGesture()
+                                                            .onChanged { val in setRotation(lastRotation + val) }
+                                                            .onEnded { _ in lastRotation = rotation }
+                                                    ),
+                                                    DragGesture()
+                                                        .onChanged { val in
+                                                            offset = CGSize(
+                                                                width: lastOffset.width + val.translation.width,
+                                                                height: lastOffset.height + val.translation.height
+                                                            )
+                                                        }
+                                                        .onEnded { _ in lastOffset = offset }
+                                                )
                                             )
-                                        )
+                                    }
+                                    .frame(width: geo.size.width, height: geo.size.height)
+                                    .scaleEffect(zoom, anchor: EyeGuide.anchor)
+                                    
+                                    EyeGuide(frameSize: geo.size, zoom: zoom)
                                 }
                                 .frame(width: geo.size.width, height: geo.size.height)
                                 .clipped()
+                                // The magnified photo extends far past the frame; without this its
+                                // invisible parts swallow taps meant for the buttons and sliders
+                                .contentShape(Rectangle())
                                 .onAppear { cropSize = geo.size }
                                 .onChange(of: geo.size) { _, newSize in cropSize = newSize }
                             }
@@ -461,14 +531,30 @@ struct ImageCropperModal: View {
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Theme.accent, lineWidth: 2))
                         .padding(.horizontal, 24)
                     
-                    // Zoom Slider for Simulator
-                    HStack {
-                        Image(systemName: "minus.magnifyingglass").foregroundColor(Theme.taupeGrey)
-                        Slider(value: Binding(get: { scale }, set: { val in scale = val; lastScale = val }), in: 1.0...5.0).tint(Theme.accent)
-                        Image(systemName: "plus.magnifyingglass").foregroundColor(Theme.taupeGrey)
+                    Text(showEyes
+                         ? "Drag, pinch and twist until the centre of each eye sits on a dot"
+                         : "Check the framing, then tap Done")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundColor(Theme.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .padding(.top, 12)
+                    
+                    // Fine-tuning sliders (also the only way to zoom and rotate in the Simulator)
+                    VStack(spacing: 8) {
+                        HStack {
+                            Image(systemName: "minus.magnifyingglass").foregroundColor(Theme.taupeGrey)
+                            Slider(value: Binding(get: { scale }, set: { val in setScale(val); lastScale = scale }), in: Self.minScale...Self.maxScale).tint(Theme.accent)
+                            Image(systemName: "plus.magnifyingglass").foregroundColor(Theme.taupeGrey)
+                        }
+                        HStack {
+                            Image(systemName: "rotate.left").foregroundColor(Theme.taupeGrey)
+                            Slider(value: Binding(get: { rotation.degrees }, set: { val in setRotation(.degrees(val)); lastRotation = rotation }), in: -20...20).tint(Theme.accent)
+                            Image(systemName: "rotate.right").foregroundColor(Theme.taupeGrey)
+                        }
                     }
                     .padding(.horizontal, 32)
-                    .padding(.top, 24)
+                    .padding(.top, 16)
                     
                     if previousImage != nil {
                         Button(action: {
@@ -489,7 +575,7 @@ struct ImageCropperModal: View {
                     Spacer()
                 }
             }
-            .navigationTitle("Crop & Align")
+            .navigationTitle("Align Eyes")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.pitchBlack, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -503,5 +589,84 @@ struct ImageCropperModal: View {
                 }
             }
         }
+    }
+
+    // MARK: - Zoom and rotate around the eye markers
+    //
+    // The photo is drawn as offset, then scaled, then rotated about the frame center. To keep the
+    // part of the photo under the eye markers fixed, each scale or rotation change also shifts the
+    // offset (and lastOffset, so an in-progress drag keeps it).
+
+    /// The eye markers' midpoint, relative to the frame center.
+    private var eyePoint: CGPoint {
+        CGPoint(x: 0, y: (EyeGuide.eyeY - 0.5) * cropSize.height)
+    }
+
+    /// Rotates `point` by -`angle`, undoing the photo's rotation.
+    private func unrotate(_ point: CGPoint, by angle: Angle) -> CGPoint {
+        let c = CGFloat(cos(angle.radians)), s = CGFloat(sin(angle.radians))
+        return CGPoint(x: point.x * c + point.y * s, y: -point.x * s + point.y * c)
+    }
+
+    private func shiftOffset(by delta: CGPoint) {
+        offset.width += delta.x
+        offset.height += delta.y
+        lastOffset.width += delta.x
+        lastOffset.height += delta.y
+    }
+
+    private func setScale(_ newValue: CGFloat) {
+        let newScale = min(max(Self.minScale, newValue), Self.maxScale)
+        let e = unrotate(eyePoint, by: rotation)
+        let k = 1 / newScale - 1 / scale
+        shiftOffset(by: CGPoint(x: e.x * k, y: e.y * k))
+        scale = newScale
+    }
+
+    private func setRotation(_ newValue: Angle) {
+        let before = unrotate(eyePoint, by: rotation)
+        let after = unrotate(eyePoint, by: newValue)
+        shiftOffset(by: CGPoint(x: (after.x - before.x) / scale, y: (after.y - before.y) / scale))
+        rotation = newValue
+    }
+}
+
+/// Two fixed eye markers in the 9:16 crop frame. Putting your eyes on them gives every progress photo
+/// the same scale, position and tilt; eye spacing is set by bone, so it doesn't change as you lean out.
+/// Spacing assumes eyes ~0.27 of head height and a ~7.5-head body, so the frame shows head to about the knees.
+struct EyeGuide: View {
+    let frameSize: CGSize
+    var zoom: CGFloat = 1
+
+    static let eyeY: CGFloat = 0.12 // of frame height
+    static let eyeSpacing: CGFloat = 0.08 // of frame width
+    static let anchor = UnitPoint(x: 0.5, y: eyeY)
+
+    var body: some View {
+        let y = frameSize.height * Self.eyeY
+        // Zooming is centered on the eye line, so only the horizontal spacing grows
+        let halfGap = frameSize.width * Self.eyeSpacing / 2 * zoom
+        let left = CGPoint(x: frameSize.width / 2 - halfGap, y: y)
+        let right = CGPoint(x: frameSize.width / 2 + halfGap, y: y)
+        let ring: CGFloat = zoom > 1 ? 18 : 7
+
+        ZStack {
+            Path { path in
+                path.move(to: left)
+                path.addLine(to: right)
+            }
+            .stroke(Color.white.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+
+            ForEach([left, right], id: \.x) { point in
+                ZStack {
+                    Circle().stroke(Color.white, lineWidth: 2)
+                    Circle().fill(Theme.accent).frame(width: 3, height: 3)
+                }
+                .frame(width: ring, height: ring)
+                .shadow(color: .black.opacity(0.7), radius: 2)
+                .position(point)
+            }
+        }
+        .allowsHitTesting(false)
     }
 }

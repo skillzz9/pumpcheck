@@ -17,6 +17,7 @@ struct PublicProfileView: View {
     @State private var isWeightKg: Bool = true
     @State private var proudestLifts: [LiftRecord] = []
     @State private var progressPhotos: [String] = []
+    @State private var progressCrop: ProgressCrop = .full
     @State private var isLoading = true
     
     @State private var navToStats: Bool = false
@@ -59,9 +60,10 @@ struct PublicProfileView: View {
                             }
                             
                             VStack(spacing: 4) {
-                                Text(username)
-                                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                                    .foregroundColor(Theme.textPrimary)
+                                // Dark text on the pale header, matching your own profile
+                                Text("@\(username)")
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .foregroundColor(Theme.pitchBlack)
                                 
                                 let y = yearsLifted
                                 let m = monthsLifted
@@ -70,8 +72,8 @@ struct PublicProfileView: View {
                                 let ageStr = age.isEmpty ? "" : "\(age)yo • "
                                 
                                 Text(ageStr + finalExp)
-                                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                                    .foregroundColor(Theme.textSecondary)
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    .foregroundColor(Theme.pitchBlack)
                             }
                         }
                         
@@ -113,7 +115,7 @@ struct PublicProfileView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "hand.thumbsup.fill")
                                     .foregroundColor(Theme.accent)
-                                Text("\(kudos)")
+                                Text(kudos.compactCount)
                                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                                     .foregroundColor(Theme.textPrimary)
                             }
@@ -133,6 +135,9 @@ struct PublicProfileView: View {
                     
                     // BOTTOM HALF
                     VStack(alignment: .leading, spacing: 32) {
+                        // Progress Flicker Gallery
+                        ProgressFlickerGallery(photos: progressPhotos, crop: progressCrop)
+                        
                         // Lifts
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Proudest Lifts")
@@ -168,9 +173,6 @@ struct PublicProfileView: View {
                                 }
                             }
                         }
-                        
-                        // Progress Flicker Gallery
-                        ProgressFlickerGallery(photos: progressPhotos)
                         
                         Spacer(minLength: 40)
                     }
@@ -227,12 +229,15 @@ struct PublicProfileView: View {
             // Fetch progress photos
             let progressSnapshot = try await db.collection("users").document(userId).collection("progress").order(by: "date", descending: false).getDocuments()
             var pPhotos: [String] = []
+            var pCoverages: [[Double]?] = []
             for pDoc in progressSnapshot.documents {
                 if let photoStr = pDoc.data()["photoBase64"] as? String, !photoStr.isEmpty {
                     pPhotos.append(photoStr)
+                    pCoverages.append((pDoc.data()["coverage"] as? [NSNumber])?.map(\.doubleValue))
                 }
             }
             progressPhotos = pPhotos
+            progressCrop = ProgressCoverage.commonCrop(pCoverages)
             
         } catch {
             print("Error fetching profile: \(error)")

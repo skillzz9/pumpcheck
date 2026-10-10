@@ -61,7 +61,8 @@ struct ProgressDetailView: View {
                         .padding(.bottom, -8) // Pull it slightly closer to the image
                         
                         if let uiImage = ImageCache.decode(base64: currentEntry.photoBase64) {
-                            Image(uiImage: uiImage)
+                            // Just the photo: trim the black border the alignment step may have saved around it
+                            Image(uiImage: ProgressCoverage.trimmed(uiImage, coverage: currentEntry.coverage))
                                 .resizable()
                                 .scaledToFit()
                                 .frame(maxWidth: .infinity)

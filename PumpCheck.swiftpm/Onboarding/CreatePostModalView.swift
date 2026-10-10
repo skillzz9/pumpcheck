@@ -173,8 +173,11 @@ struct CreatePostModalView: View {
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
+                        let postCrop = ProgressCoverage.commonCrop(selectedProgressEntries.map(\.coverage))
                         ForEach(selectedProgressEntries) { entry in
-                            if let data = Data(base64Encoded: entry.photoBase64), let uiImg = UIImage(data: data) {
+                            if let data = Data(base64Encoded: entry.photoBase64), let original = UIImage(data: data) {
+                                // Preview exactly what gets posted: the shared crop without black borders
+                                let uiImg = ProgressCoverage.cropped(original, to: postCrop)
                                 ZStack(alignment: .topTrailing) {
                                     Image(uiImage: uiImg)
                                         .resizable()
@@ -241,9 +244,12 @@ struct CreatePostModalView: View {
                 }
             } else {
                 let sorted = selectedProgressEntries.sorted(by: { $0.date < $1.date })
+                // Same shared crop as the progress slider, so the posted photos line up without black borders
+                let postCrop = ProgressCoverage.commonCrop(sorted.map(\.coverage))
                 for entry in sorted {
                     if let data = Data(base64Encoded: entry.photoBase64),
-                       let uiImg = UIImage(data: data) {
+                       let original = UIImage(data: data) {
+                        let uiImg = ProgressCoverage.cropped(original, to: postCrop)
                         let resized = uiImg.size.width > 600 ? uiImg.resized(toWidth: 600) ?? uiImg : uiImg
                         if let compressed = resized.jpegData(compressionQuality: 0.3) {
                             processedPhotos.append(compressed.base64EncodedString())

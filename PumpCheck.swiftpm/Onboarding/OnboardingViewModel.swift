@@ -190,27 +190,30 @@ class OnboardingViewModel {
             
             try await db.collection("users").document(uid).setData(dataToSave)
             
-            // Auto-generate initial progress entry
-            let initialEntryId = UUID().uuidString
-            let progressData: [String: Any] = [
-                "id": initialEntryId,
-                "date": FieldValue.serverTimestamp(),
-                "photoBase64": photoBase64,
-                "weight": weight,
-                "lifts": liftsDict
-            ]
-            try await db.collection("users").document(uid).collection("progress").document(initialEntryId).setData(progressData)
-            
-            let initialEntry = ProgressEntry(
-                id: initialEntryId,
-                date: Date(),
-                photoBase64: photoBase64,
-                weight: weight,
-                lifts: proudestLifts
-            )
+            // Auto-generate initial progress entry, only when there's a photo to start the timeline with
+            var initialEntries: [ProgressEntry] = []
+            if !photoBase64.isEmpty {
+                let initialEntryId = UUID().uuidString
+                let progressData: [String: Any] = [
+                    "id": initialEntryId,
+                    "date": FieldValue.serverTimestamp(),
+                    "photoBase64": photoBase64,
+                    "weight": weight,
+                    "lifts": liftsDict
+                ]
+                try await db.collection("users").document(uid).collection("progress").document(initialEntryId).setData(progressData)
+
+                initialEntries.append(ProgressEntry(
+                    id: initialEntryId,
+                    date: Date(),
+                    photoBase64: photoBase64,
+                    weight: weight,
+                    lifts: proudestLifts
+                ))
+            }
             
             await MainActor.run {
-                self.progressEntries = [initialEntry]
+                self.progressEntries = initialEntries
                 self.isCreatingAccount = false
             }
         } catch {
@@ -223,22 +226,40 @@ class OnboardingViewModel {
         }
     }
 
-    func saveProgressEntry(_ entry: ProgressEntry) {
-        progressEntries.append(entry)
-        
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+    /// Uploads the entry and adds it locally once Firebase confirms, so a failed save is reported, not lost.
+    func saveProgressEntry(_ entry: ProgressEntry) async throws {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            throw NSError(domain: "PumpCheck", code: 401, userInfo: [NSLocalizedDescriptionKey: "You're not signed in. Sign in again and retry."])
+        }
         let db = Firestore.firestore()
         
         let liftsDict = entry.lifts.map { ["name": $0.name, "weight": $0.weight, "reps": $0.reps] }
-        let data: [String: Any] = [
+        var data: [String: Any] = [
             "id": entry.id,
             "date": Timestamp(date: entry.date),
             "photoBase64": entry.photoBase64,
             "weight": entry.weight,
             "lifts": liftsDict
         ]
+        if let coverage = entry.coverage, coverage.count == 8 {
+            data["coverage"] = coverage
+        }
         
-        db.collection("users").document(uid).collection("progress").document(entry.id).setData(data)
+        try await db.collection("users").document(uid).collection("progress").document(entry.id).setData(data)
+        await MainActor.run { progressEntries.append(entry) }
+    }
+
+    /// Logs a weigh-in without a photo. It feeds the weight graph; the photo screens skip it.
+    /// Updates the profile weight when it's the most recent weigh-in.
+    func addWeightEntry(weight: String, date: Date) async throws {
+        let isLatest = progressEntries.allSatisfy { $0.date <= date || Double($0.weight) == nil }
+        try await saveProgressEntry(ProgressEntry(date: date, photoBase64: "", weight: weight, lifts: []))
+        if isLatest {
+            await MainActor.run {
+                self.weight = weight
+                syncProfileStatsToFirebase()
+            }
+        }
     }
 
     func deleteProgressEntry(_ entry: ProgressEntry) async throws {
@@ -375,6 +396,24 @@ class OnboardingViewModel {
         db.collection("users").document(uid).updateData(data)
     }
 
+    /// Uses a progress photo as the profile picture when the user doesn't have one yet.
+    func setProfilePhotoIfMissing(from image: UIImage) {
+        guard profileImageData == nil else { return }
+        setProfilePhoto(from: image)
+    }
+
+    /// Sets the profile picture, shrunk to keep the user document well under Firestore's 1 MB limit.
+    func setProfilePhoto(from image: UIImage) {
+        guard let data = (image.resized(toWidth: 400) ?? image).jpegData(compressionQuality: 0.5) else { return }
+        profileImageData = data
+
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        if let photo = UIImage(data: data) {
+            Task { @MainActor in ProfilePhotoCache.shared.set(photo, for: uid) }
+        }
+        Firestore.firestore().collection("users").document(uid).updateData(["photoBase64": data.base64EncodedString()])
+    }
+
     func fetchUserData(uid: String) async throws {
         let db = Firestore.firestore()
         let doc = try await db.collection("users").document(uid).getDocument()
@@ -406,7 +445,8 @@ class OnboardingViewModel {
                         }
                     }
                     
-                    let entry = ProgressEntry(id: id, date: date, photoBase64: photoBase64, weight: weight, lifts: entryLifts)
+                    let coverage = (pData["coverage"] as? [NSNumber])?.map(\.doubleValue)
+                    let entry = ProgressEntry(id: id, date: date, photoBase64: photoBase64, weight: weight, lifts: entryLifts, coverage: coverage)
                     fetchedEntries.append(entry)
                 }
             }

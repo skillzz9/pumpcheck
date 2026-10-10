@@ -12,6 +12,7 @@ struct ProfileView: View {
     @State private var deletePassword = ""
     @State private var isDeletingAccount = false
     @State private var deleteError: String? = nil
+    @State private var showPhotoPicker = false
 
     var body: some View {
         NavigationStack {
@@ -19,22 +20,6 @@ struct ProfileView: View {
             Theme.bgGradient.ignoresSafeArea()
             
             ScrollView {
-                HStack {
-                    Spacer()
-                    Menu {
-                        Button(role: .destructive, action: {
-                            deletePassword = ""
-                            showDeleteConfirm = true
-                        }) {
-                            Label("Delete Account", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 20))
-                            .foregroundColor(Theme.textSecondary)
-                            .padding()
-                    }
-                }
                 VStack(spacing: 32) {
                     // TOP HALF
                     VStack(spacing: 12) {
@@ -53,10 +38,21 @@ struct ProfileView: View {
                                         .frame(width: 216, height: 216)
                                         .clipShape(Circle())
                                 } else {
-                                    Image(systemName: "person.crop.circle.fill")
-                                        .resizable()
-                                        .frame(width: 216, height: 216)
-                                        .foregroundColor(Theme.accent)
+                                    // No photo yet: the first progress photo becomes the profile picture
+                                    VStack(spacing: 8) {
+                                        Image(systemName: "camera.fill")
+                                            .font(.system(size: 36))
+                                            .foregroundColor(Theme.accent)
+                                        Text("Go to Progress\nto upload")
+                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                            .foregroundColor(Theme.textSecondary)
+                                            .multilineTextAlignment(.center)
+                                    }
+                                    .frame(width: 216, height: 216)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Theme.accent.opacity(0.5), style: StrokeStyle(lineWidth: 2, dash: [8, 8]))
+                                    )
                                 }
                                 
                                 if viewModel.isNatty {
@@ -78,7 +74,19 @@ struct ProfileView: View {
                                     .shadow(color: Theme.accent.opacity(0.3), radius: 3, x: 0, y: 2)
                                     .offset(x: 78, y: -96)
                                 }
+
+                                // Edit badge: the picture can be changed to any progress diary photo
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(Theme.pitchBlack)
+                                    .frame(width: 36, height: 36)
+                                    .background(Theme.accent)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Theme.paleSky, lineWidth: 3))
+                                    .offset(x: 76, y: 78)
                             }
+                            .contentShape(Circle())
+                            .onTapGesture { showPhotoPicker = true }
                             
                             VStack(spacing: 2) {
                                 Text("@\(viewModel.username.isEmpty ? "username" : viewModel.username)")
@@ -135,7 +143,7 @@ struct ProfileView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "hand.thumbsup.fill")
                                     .foregroundColor(Theme.accent)
-                                Text("\(viewModel.kudos)")
+                                Text(viewModel.kudos.compactCount)
                                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                                     .foregroundColor(Theme.textPrimary)
                             }
@@ -149,12 +157,36 @@ struct ProfileView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 12)
                     .padding(.bottom, 12)
+                    // Floats over the header instead of taking its own row
+                    .overlay(alignment: .topTrailing) {
+                        Menu {
+                            Button(action: { showPhotoPicker = true }) {
+                                Label("Change Profile Picture", systemImage: "person.crop.circle")
+                            }
+                            Button(role: .destructive, action: {
+                                deletePassword = ""
+                                showDeleteConfirm = true
+                            }) {
+                                Label("Delete Account", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(Theme.textSecondary)
+                                .padding(16)
+                        }
+                    }
                     .background(
                         Theme.paleSky.padding(.top, -1000)
                     )
                     
                     // BOTTOM HALF
                     VStack(spacing: 32) {
+                        // Progress Flicker Gallery
+                        let photoEntries = viewModel.progressEntries.sorted(by: { $0.date < $1.date }).filter { !$0.photoBase64.isEmpty }
+                        ProgressFlickerGallery(photos: photoEntries.map(\.photoBase64),
+                                               crop: ProgressCoverage.commonCrop(photoEntries.map(\.coverage)))
+                        
                         // Lifts
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Proudest Lifts")
@@ -190,10 +222,6 @@ struct ProfileView: View {
                                 }
                             }
                         }
-                        
-                        // Progress Flicker Gallery
-                        let photoArray = viewModel.progressEntries.sorted(by: { $0.date < $1.date }).map { $0.photoBase64 }.filter { !$0.isEmpty }
-                        ProgressFlickerGallery(photos: photoArray)
                         
                         // Goals
                         VStack(alignment: .leading, spacing: 16) {
@@ -317,8 +345,16 @@ struct ProfileView: View {
             } message: {
                 Text(deleteError ?? "")
             }
+        // No title on the profile, so don't reserve space for a navigation bar
+        .toolbar(.hidden, for: .navigationBar)
+        .sheet(isPresented: $showPhotoPicker) {
+            ProfilePhotoPicker(viewModel: viewModel)
+        }
         .navigationDestination(isPresented: $navToStats) {
-                StatsView(userId: Auth.auth().currentUser?.uid ?? "", username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts, selection: initialStatSelection)
+                StatsView(userId: Auth.auth().currentUser?.uid ?? "", username: viewModel.username, heightStr: viewModel.height, weightStr: viewModel.weight, lifts: viewModel.proudestLifts,
+                          onAddWeight: { weight, date in try await viewModel.addWeightEntry(weight: weight, date: date) },
+                          weightUnit: viewModel.isWeightKg ? "kg" : "lbs",
+                          selection: initialStatSelection)
             }
         }
     }
@@ -327,6 +363,7 @@ struct ProfileView: View {
 
 struct ProgressFlickerGallery: View {
     let photos: [String] // Array of base64 strings
+    var crop: ProgressCrop = .full // Shared crop that hides black borders, see ProgressCoverage
     @State private var sliderValue: Double = 0
     @AppStorage(ProgressSliderMode.storageKey) private var sliderMode: ProgressSliderMode = .flicker
     
@@ -346,7 +383,7 @@ struct ProgressFlickerGallery: View {
                     .cornerRadius(16)
             } else {
                 VStack(spacing: 0) {
-                    ProgressPhotoStack(photos: photos, sliderValue: sliderValue, mode: sliderMode)
+                    ProgressPhotoStack(photos: photos, sliderValue: sliderValue, mode: sliderMode, crop: crop)
                         .overlay(alignment: .topTrailing) {
                             if photos.count > 1 {
                                 ProgressSliderModeToggle(mode: $sliderMode)

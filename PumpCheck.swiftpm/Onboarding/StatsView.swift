@@ -15,9 +15,14 @@ struct StatsView: View {
     let weightStr: String
     let lifts: [LiftRecord]
     
+    /// Set only on your own profile: shows the + on the weight graph and saves a weigh-in.
+    var onAddWeight: ((String, Date) async throws -> Void)? = nil
+    var weightUnit: String = "kg"
+    
     @State var selection: StatSelection
     @State private var progressEntries: [ProgressEntry] = []
     @State private var isFetching: Bool = true
+    @State private var showAddWeight = false
     
     var body: some View {
         ZStack {
@@ -85,6 +90,19 @@ struct StatsView: View {
                             StatChartView(title: "Height", data: getFakeHeightData())
                         } else if selection == .weight {
                             StatChartView(title: "Weight", data: getRealWeightData())
+                                .overlay(alignment: .topTrailing) {
+                                    if onAddWeight != nil {
+                                        Button { showAddWeight = true } label: {
+                                            Image(systemName: "plus")
+                                                .font(.system(size: 18, weight: .bold))
+                                                .foregroundColor(Theme.pitchBlack)
+                                                .frame(width: 36, height: 36)
+                                                .background(Theme.accent)
+                                                .clipShape(Circle())
+                                        }
+                                        .padding(.trailing, 16)
+                                    }
+                                }
                         } else if case let .lift(name) = selection {
                             StatChartView(title: "\(name) Progress", data: getRealLiftData(for: name))
                         }
@@ -99,6 +117,14 @@ struct StatsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await fetchProgress()
+        }
+        .sheet(isPresented: $showAddWeight) {
+            if let onAddWeight {
+                AddWeightSheet(unit: weightUnit, initialWeight: weightStr) { weight, date in
+                    try await onAddWeight(weight, date)
+                    await fetchProgress()
+                }
+            }
         }
     }
     
@@ -260,5 +286,97 @@ struct StatChartView: View {
             .padding(.horizontal)
         }
         .padding(.top, 24)
+    }
+}
+
+
+/// Small sheet for logging a weigh-in: weight plus the day it was taken (today by default).
+struct AddWeightSheet: View {
+    let unit: String
+    let initialWeight: String
+    let onSave: (String, Date) async throws -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var weightText = ""
+    @State private var date = Date()
+    @State private var isSaving = false
+    @State private var errorMessage: String?
+    @FocusState private var weightFocused: Bool
+
+    private var cleanedWeight: String? {
+        let text = weightText.replacingOccurrences(of: ",", with: ".").trimmingCharacters(in: .whitespaces)
+        guard let value = Double(text), value > 20, value < 400 else { return nil }
+        return text
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Theme.pitchBlack.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        TextField(initialWeight.isEmpty ? "0" : initialWeight, text: $weightText)
+                            .keyboardType(.decimalPad)
+                            .focused($weightFocused)
+                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .foregroundColor(Theme.textPrimary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize()
+                        Text(unit)
+                            .font(.system(size: 22, weight: .semibold, design: .rounded))
+                            .foregroundColor(Theme.textSecondary)
+                    }
+                    .padding(.top, 8)
+
+                    DatePicker("Date", selection: $date, in: ...Date(), displayedComponents: .date)
+                        .foregroundColor(Theme.textPrimary)
+                        .tint(Theme.accent)
+                        .padding()
+                        .background(Theme.cardBackground)
+                        .cornerRadius(16)
+
+                    Spacer()
+                }
+                .padding(24)
+            }
+            .navigationTitle("Log Weight")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundColor(Theme.textPrimary)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if isSaving {
+                        ProgressView().tint(Theme.accent)
+                    } else {
+                        Button("Save") { save() }
+                            .fontWeight(.bold)
+                            .foregroundColor(cleanedWeight == nil ? Theme.textSecondary : Theme.accent)
+                            .disabled(cleanedWeight == nil)
+                    }
+                }
+            }
+            .alert("Couldn't save", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage ?? "")
+            }
+        }
+        .presentationDetents([.medium])
+        .onAppear { weightFocused = true }
+    }
+
+    private func save() {
+        guard let weight = cleanedWeight else { return }
+        isSaving = true
+        Task {
+            do {
+                try await onSave(weight, date)
+                dismiss()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isSaving = false
+        }
     }
 }

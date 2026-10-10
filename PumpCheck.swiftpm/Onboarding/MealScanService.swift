@@ -337,7 +337,7 @@ class MealScanService {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.timeoutInterval = 120
+        request.timeoutInterval = 180 // Photo scans with thinking can take a while; leave plenty of headroom
         request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         if model == .opus5 {
             request.setValue("server-side-fallback-2026-07-01", forHTTPHeaderField: "anthropic-beta")

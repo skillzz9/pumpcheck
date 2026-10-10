@@ -9,7 +9,7 @@ struct OnboardingWrapperView: View {
     @State private var showLogin: Bool = false
     @State private var authHandle: AuthStateDidChangeListenerHandle? = nil
     
-    let totalSteps = 8
+    let totalSteps = 7
     
     var body: some View {
         Group {
@@ -43,9 +43,9 @@ struct OnboardingWrapperView: View {
                         ActivityStepView(viewModel: viewModel).tag(3)
                         Step3View(viewModel: viewModel).tag(4)
                         Step4View(viewModel: viewModel).tag(5)
-                        Step5View(viewModel: viewModel).tag(6)
-                        Step6View(viewModel: viewModel).tag(7)
-                        Step7View(viewModel: viewModel).tag(8)
+                        // Baseline picture step (Step5View) is out of the flow for now to keep sign-up quick
+                        Step6View(viewModel: viewModel).tag(6)
+                        Step7View(viewModel: viewModel).tag(7)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .animation(.easeInOut, value: currentStep)

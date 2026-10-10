@@ -80,29 +80,6 @@ struct FeedView: View {
                 }
             }
             .toolbar {
-                #if DEBUG
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        Task {
-                            let db = Firestore.firestore()
-                            if let snap = try? await db.collection("posts").getDocuments() {
-                                for doc in snap.documents {
-                                    try? await db.collection("posts").document(doc.documentID).delete()
-                                }
-                            }
-                            await fetchPosts()
-                        }
-                    }) {
-                        Text("Clear All")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.red)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(8)
-                    }
-                }
-                #endif
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showCreatePost = true }) {
                         Image(systemName: "plus")
@@ -307,7 +284,7 @@ struct FeedPostView: View {
             // Image area
             if post.photos.count > 1 {
                 VStack(spacing: 0) {
-                    ProgressPhotoStack(photos: post.photos, sliderValue: sliderValue, mode: sliderMode, fill: true)
+                    ProgressPhotoStack(photos: post.photos, sliderValue: sliderValue, mode: sliderMode) // Whole photo, capped in height so it fits while sliding
                         .overlay(alignment: .topTrailing) {
                             ProgressSliderModeToggle(mode: $sliderMode)
                         }
@@ -336,6 +313,9 @@ struct FeedPostView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                 }
+                .task(id: post.photos.count) {
+                    await DemoMode.autoSlide(photoCount: post.photos.count) { sliderValue = $0 }
+                }
             } else if let firstPhoto = post.photos.first, let uiImage = ImageCache.decode(base64: firstPhoto) {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -360,9 +340,16 @@ struct FeedPostView: View {
                 Button {
                     toggleKudo()
                 } label: {
-                    Image(systemName: post.isKudoed ? "heart.fill" : "heart")
-                        .font(.system(size: 24))
-                        .foregroundColor(post.isKudoed ? Theme.accent : Theme.textPrimary)
+                    HStack(spacing: 6) {
+                        Image(systemName: post.isKudoed ? "hand.thumbsup.fill" : "hand.thumbsup")
+                            .font(.system(size: 24))
+                        if post.kudos > 0 {
+                            Text(post.kudos.compactCount)
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .monospacedDigit()
+                        }
+                    }
+                    .foregroundColor(post.isKudoed ? Theme.accent : Theme.textPrimary)
                 }
                 
                 // Comment Button
@@ -388,14 +375,6 @@ struct FeedPostView: View {
             }
             .padding(.horizontal, 12)
             .padding(.top, 4)
-            
-            // Kudo count
-            if post.kudos > 0 {
-                Text("\(post.kudos) \(post.kudos == 1 ? "kudo" : "kudos")")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(Theme.textPrimary)
-                    .padding(.horizontal, 12)
-            }
             
             // Caption
             if !post.caption.isEmpty {

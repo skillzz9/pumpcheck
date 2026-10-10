@@ -15,6 +15,7 @@ struct ProgressPhotoStack: View {
     let sliderValue: Double
     let mode: ProgressSliderMode
     var fill: Bool = false // true = square-cropped (feed), false = fit (profile / progress)
+    var crop: ProgressCrop = .full // Fit mode: shared crop that hides black borders, see ProgressCoverage
 
     static let maxFitHeight: CGFloat = 480
 
@@ -53,6 +54,8 @@ struct ProgressPhotoStack: View {
                     .resizable()
                     .scaledToFit()
                     .frame(maxHeight: Self.maxFitHeight) // Keep the whole photo plus slider on screen
+                    .scaleEffect(1 / crop.scale, anchor: crop.anchor)
+                    .clipped()
                     .frame(maxWidth: .infinity)
                     .background(Theme.pitchBlack)
             }

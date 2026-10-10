@@ -12,6 +12,8 @@ struct CommentModalView: View {
     @State private var replyingToId: String? = nil
     @State private var errorMessage: String? = nil
     @State private var showErrorAlert: Bool = false
+    @State private var sliderValue: Double = 0
+    @AppStorage(ProgressSliderMode.storageKey) private var sliderMode: ProgressSliderMode = .flicker
     
     var body: some View {
         VStack(spacing: 0) {
@@ -42,7 +44,44 @@ struct CommentModalView: View {
             .padding()
             .background(Theme.pitchBlack)
             
-            // Image (1/3 of screen)
+            // Image (1/3 of screen): the same progress slider as the feed when the post has several photos
+            if post.photos.count > 1 {
+                VStack(spacing: 0) {
+                    ProgressPhotoStack(photos: post.photos, sliderValue: sliderValue, mode: sliderMode)
+                        .frame(height: UIScreen.main.bounds.height / 3)
+                        .frame(maxWidth: .infinity)
+                        .background(Theme.pitchBlack)
+                        .clipped()
+                        .overlay(alignment: .topTrailing) {
+                            ProgressSliderModeToggle(mode: $sliderMode)
+                        }
+
+                    VStack(spacing: 4) {
+                        Slider(value: $sliderValue, in: 0...Double(post.photos.count - 1), onEditingChanged: { editing in
+                            if !editing && sliderMode == .flicker {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    sliderValue = round(sliderValue)
+                                }
+                            }
+                        })
+                        .tint(Theme.accent)
+
+                        HStack {
+                            Text("Earliest")
+                            Spacer()
+                            Text("Latest")
+                        }
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(Theme.taupeGrey)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 8)
+                }
+                .background(Theme.pitchBlack)
+                .task(id: post.photos.count) {
+                    await DemoMode.autoSlide(photoCount: post.photos.count) { sliderValue = $0 }
+                }
+            } else {
             GeometryReader { geo in
                 if let uiImage = ImageCache.decode(base64: post.photoBase64) {
                     Image(uiImage: uiImage)
@@ -64,6 +103,7 @@ struct CommentModalView: View {
                 }
             }
             .frame(height: UIScreen.main.bounds.height / 3)
+            }
             
             // Comments area
             ScrollView {
@@ -77,29 +117,13 @@ struct CommentModalView: View {
                         ForEach($post.comments) { $comment in
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(alignment: .top, spacing: 12) {
-                                // Profile picture
-                                Group {
-                                    if !comment.photoBase64.isEmpty, let uiImage = ImageCache.decode(base64: comment.photoBase64) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 36, height: 36)
-                                            .clipShape(Circle())
-                                    } else {
-                                        Circle()
-                                            .fill(Theme.taupeGrey.opacity(0.5))
-                                            .frame(width: 36, height: 36)
-                                            .overlay(
-                                                Text(String(comment.username.prefix(1).uppercased()))
-                                                    .font(.system(size: 14, weight: .bold))
-                                                    .foregroundColor(Theme.textPrimary)
-                                            )
-                                    }
-                                }
+                                // Profile picture: the commenter's current one, not the copy saved with the comment
+                                UserAvatar(userId: comment.userId, username: comment.username, fallbackBase64: comment.photoBase64, size: 36)
                                 
                                 // Username and comment text
                                 VStack(alignment: .leading, spacing: 4) {
-                                    HStack(alignment: .top, spacing: 4) {
+                                    // Username on its own line so the comment wraps across the full width
+                                    VStack(alignment: .leading, spacing: 2) {
                                         Button { onNavigateToProfile(comment.userId, comment.username) } label: {
                                             Text(comment.username)
                                                 .font(.system(size: 14, weight: .bold))
@@ -108,11 +132,12 @@ struct CommentModalView: View {
                                         Text(comment.text)
                                             .font(.system(size: 14))
                                             .foregroundColor(Theme.textPrimary)
+                                            .fixedSize(horizontal: false, vertical: true)
                                     }
                                     
                                     HStack(spacing: 12) {
                                         if comment.likesCount > 0 {
-                                            Text("\(comment.likesCount) likes")
+                                            Text("\(comment.likesCount.compactCount) likes")
                                                 .font(.system(size: 12))
                                                 .foregroundColor(Theme.textSecondary)
                                         }
@@ -127,8 +152,7 @@ struct CommentModalView: View {
                                         }
                                     }
                                 }
-                                
-                                Spacer()
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 // Like button
                                 Button {
@@ -151,39 +175,20 @@ struct CommentModalView: View {
                             if !comment.replies.isEmpty {
                                 ForEach($comment.replies) { $reply in
                                     HStack(alignment: .top, spacing: 12) {
-                                        Group {
-                                            if !reply.photoBase64.isEmpty, let uiImage = ImageCache.decode(base64: reply.photoBase64) {
-                                                Image(uiImage: uiImage)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 28, height: 28)
-                                                    .clipShape(Circle())
-                                            } else {
-                                                Circle()
-                                                    .fill(Theme.taupeGrey.opacity(0.5))
-                                                    .frame(width: 28, height: 28)
-                                                    .overlay(
-                                                        Text(String(reply.username.prefix(1).uppercased()))
-                                                            .font(.system(size: 12, weight: .bold))
-                                                            .foregroundColor(Theme.textPrimary)
-                                                    )
-                                            }
-                                        }
+                                        UserAvatar(userId: reply.userId, username: reply.username, fallbackBase64: reply.photoBase64, size: 28)
                                         
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            HStack(alignment: .top, spacing: 4) {
-                                                Button { onNavigateToProfile(reply.userId, reply.username) } label: {
-                                                    Text(reply.username)
-                                                        .font(.system(size: 13, weight: .bold))
-                                                        .foregroundColor(Theme.textPrimary)
-                                                }
-                                                Text(reply.text)
-                                                    .font(.system(size: 13))
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Button { onNavigateToProfile(reply.userId, reply.username) } label: {
+                                                Text(reply.username)
+                                                    .font(.system(size: 13, weight: .bold))
                                                     .foregroundColor(Theme.textPrimary)
                                             }
+                                            Text(reply.text)
+                                                .font(.system(size: 13))
+                                                .foregroundColor(Theme.textPrimary)
+                                                .fixedSize(horizontal: false, vertical: true)
                                         }
-                                        
-                                        Spacer()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                         
                                         Button {
                                             withAnimation {
